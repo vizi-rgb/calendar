@@ -1,3 +1,4 @@
+"use client";
 import { ModeToggle } from "@/components/topbar/mode-toggle";
 import Settings from "@/components/topbar/settings";
 import Notifications from "@/components/topbar/notifications";
@@ -22,9 +23,9 @@ function IconButtons() {
   );
 }
 
-function Hamburger() {
+function Hamburger(prop: { onClick?: () => void }) {
   return (
-    <Button variant="ghost" size="icon">
+    <Button variant="ghost" size="icon" onClick={prop.onClick}>
       <HamburgerMenuIcon className="size-5" />
     </Button>
   );
@@ -55,12 +56,19 @@ function TimelineOptions() {
 }
 
 export default function Topbar() {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const handleHamburgerClick = () => {
+    setIsOpen(!isOpen);
+    console.log(isOpen);
+  };
+
   return (
-    <div className="py-3 px-5">
+    <div className="py-3">
       <div className="grid grid-cols-3 items-center">
         <div className="flex flex-row items-center gap-x-10 justify-self-start">
           <div className="flex flex-row gap-x-2 items-center">
-            <Hamburger />
+            <Hamburger onClick={handleHamburgerClick} />
             <h3>Kalendarz</h3>
           </div>
           <DatePicker />
@@ -75,6 +83,9 @@ export default function Topbar() {
           <AvatarWithName />
         </div>
       </div>
+      {/*<div className="py-2">*/}
+      {/*  <SideMenu setIsOpen={false} />*/}
+      {/*</div>*/}
     </div>
   );
 }
