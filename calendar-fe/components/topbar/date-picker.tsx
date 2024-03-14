@@ -16,17 +16,10 @@ function CalendarPopover() {
   const today = new Date();
   setDefaultOptions({ locale: pl });
 
-  const [date, setDate] = useState<Date>(today);
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-
-  let handleSelect = (date: Date | undefined) => {
-    if (date) {
-      setDate(date);
-      setIsCalendarOpen(false);
-    }
-  };
+  const [date, setDate] = useState<Date | undefined>(today);
 
   let formatDate = () => {
+    if (!date) return;
     let formattedDate = format(date, "LLLL y");
     formattedDate =
       formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
@@ -34,16 +27,17 @@ function CalendarPopover() {
   };
 
   return (
-    <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+    <Popover>
       <PopoverTrigger asChild>
         <Button variant={"ghost"}>{formatDate()}</Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
         <Calendar
+          locale={pl}
           mode="single"
           selected={date}
-          onSelect={handleSelect}
           initialFocus
+          onSelect={setDate}
         />
       </PopoverContent>
     </Popover>

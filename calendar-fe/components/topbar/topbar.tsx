@@ -1,3 +1,4 @@
+"use client";
 import { ModeToggle } from "@/components/topbar/mode-toggle";
 import Settings from "@/components/topbar/settings";
 import Notifications from "@/components/topbar/notifications";
@@ -10,6 +11,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Command, CommandInput } from "@/components/ui/command";
 import AvatarWithName from "@/components/topbar/avatar-with-name";
 import DatePicker from "@/components/topbar/date-picker";
+import { useAppDispatch } from "@/lib/hooks";
+import { toggleSidebar } from "@/lib/features/sidebar/sidebar-slice";
 
 function IconButtons() {
   return (
@@ -22,9 +25,9 @@ function IconButtons() {
   );
 }
 
-function Hamburger() {
+function Hamburger(prop: { onClick?: () => void }) {
   return (
-    <Button variant="ghost" size="icon">
+    <Button variant="ghost" size="icon" onClick={prop.onClick}>
       <HamburgerMenuIcon className="size-5" />
     </Button>
   );
@@ -55,12 +58,18 @@ function TimelineOptions() {
 }
 
 export default function Topbar() {
+  const dispatch = useAppDispatch();
+
+  const handleHamburgerClick = () => {
+    dispatch(toggleSidebar());
+  };
+
   return (
-    <div className="py-3 px-5">
+    <div className="py-3">
       <div className="grid grid-cols-3 items-center">
         <div className="flex flex-row items-center gap-x-10 justify-self-start">
           <div className="flex flex-row gap-x-2 items-center">
-            <Hamburger />
+            <Hamburger onClick={handleHamburgerClick} />
             <h3>Kalendarz</h3>
           </div>
           <DatePicker />
@@ -75,6 +84,9 @@ export default function Topbar() {
           <AvatarWithName />
         </div>
       </div>
+      {/*<div className="py-2">*/}
+      {/*  <SideBar setIsOpen={false} />*/}
+      {/*</div>*/}
     </div>
   );
 }
