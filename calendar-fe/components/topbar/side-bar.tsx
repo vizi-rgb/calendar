@@ -1,3 +1,4 @@
+"use client";
 import {
   Accordion,
   AccordionContent,
@@ -6,6 +7,7 @@ import {
 } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { useAppSelector } from "@/lib/hooks";
 
 function CheckboxWrapper(prop: { text: string }) {
   return (
@@ -55,13 +57,13 @@ function Events() {
   );
 }
 
-export default function SideMenu(prop: { setIsOpen: boolean }) {
-  console.log({ sidemenu: prop.setIsOpen });
+export default function SideBar() {
+  const isOpen = useAppSelector((state) => state.sidebar.isToggled);
   return (
     <div
       className={cn(
-        "relative top-0 left-0 px-2 overflow-hidden transition-all",
-        prop.setIsOpen ? "w-[300px]" : "w-[0px]",
+        "relative top-0 left-0 px-2 overflow-hidden transition-all duration-500 ease-in-out",
+        isOpen ? "w-[300px]" : "w-[0px]",
       )}
     >
       <div className="flex flex-col gap-y-5 text-clip overflow-hidden text-nowrap">

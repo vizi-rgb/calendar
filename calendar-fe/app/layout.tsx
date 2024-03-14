@@ -3,7 +3,8 @@ import { cn } from "@/lib/utils";
 import { Inter as FontSans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import Topbar from "@/components/topbar/topbar";
-import SideMenu from "@/components/topbar/side-menu";
+import SideBar from "@/components/topbar/side-bar";
+import StoreProvider from "@/app/store-provider";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -29,13 +30,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="px-5">
-            <Topbar />
-            <div className="flex flex-row py-2 gap-x-2">
-              <SideMenu setIsOpen={true} />
-              {children}
+          <StoreProvider>
+            <div className="px-5">
+              <Topbar />
+              <div className="flex flex-row py-2 gap-x-2">
+                <SideBar setIsOpen={true} />
+                {children}
+              </div>
             </div>
-          </div>
+          </StoreProvider>
         </ThemeProvider>
       </body>
     </html>

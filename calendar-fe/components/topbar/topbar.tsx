@@ -11,6 +11,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Command, CommandInput } from "@/components/ui/command";
 import AvatarWithName from "@/components/topbar/avatar-with-name";
 import DatePicker from "@/components/topbar/date-picker";
+import { useAppDispatch } from "@/lib/hooks";
+import { toggleSidebar } from "@/lib/features/sidebar/sidebar-slice";
 
 function IconButtons() {
   return (
@@ -56,11 +58,10 @@ function TimelineOptions() {
 }
 
 export default function Topbar() {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const dispatch = useAppDispatch();
 
   const handleHamburgerClick = () => {
-    setIsOpen(!isOpen);
-    console.log(isOpen);
+    dispatch(toggleSidebar());
   };
 
   return (
@@ -84,7 +85,7 @@ export default function Topbar() {
         </div>
       </div>
       {/*<div className="py-2">*/}
-      {/*  <SideMenu setIsOpen={false} />*/}
+      {/*  <SideBar setIsOpen={false} />*/}
       {/*</div>*/}
     </div>
   );
