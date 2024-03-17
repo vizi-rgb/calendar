@@ -7,12 +7,12 @@ import CreateButton from "@/components/topbar/create-button";
 import { Button } from "@/components/ui/button";
 import * as React from "react";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Command, CommandInput } from "@/components/ui/command";
 import AvatarWithName from "@/components/topbar/avatar-with-name";
 import DatePicker from "@/components/topbar/date-picker";
 import { useAppDispatch } from "@/lib/hooks";
 import { toggleSidebar } from "@/lib/features/sidebar/sidebar-slice";
+import TimelineSelect from "@/components/topbar/timeline-select";
 
 function IconButtons() {
   return (
@@ -41,22 +41,6 @@ function CommandWrapper() {
   );
 }
 
-function TimelineOptions() {
-  let options = ["1D", "5D", "1T", "1M", "1R"];
-
-  return (
-    <Tabs defaultValue="1D" className="">
-      <TabsList className="grid w-full grid-cols-5">
-        {options.map((option) => (
-          <TabsTrigger key={option} value={option} className="px-1.5">
-            {option}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-    </Tabs>
-  );
-}
-
 export default function Topbar() {
   const dispatch = useAppDispatch();
 
@@ -73,7 +57,7 @@ export default function Topbar() {
             <h3>Kalendarz</h3>
           </div>
           <DatePicker />
-          <TimelineOptions />
+          <TimelineSelect />
         </div>
         <div className="justify-self-center w-[400px]">
           <CommandWrapper />
@@ -84,9 +68,6 @@ export default function Topbar() {
           <AvatarWithName />
         </div>
       </div>
-      {/*<div className="py-2">*/}
-      {/*  <SideBar setIsOpen={false} />*/}
-      {/*</div>*/}
     </div>
   );
 }
