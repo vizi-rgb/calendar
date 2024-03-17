@@ -5,9 +5,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/lib/hooks";
+import { Checkbox } from "@/components/ui/checkbox";
 
 function CheckboxWrapper(prop: { text: string }) {
   return (

@@ -34,7 +34,7 @@ export default function RootLayout({
             <div className="px-5">
               <Topbar />
               <div className="flex flex-row py-2 gap-x-2">
-                <SideBar setIsOpen={true} />
+                <SideBar />
                 {children}
               </div>
             </div>
