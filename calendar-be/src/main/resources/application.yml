@@ -1,0 +1,11 @@
+server:
+  servlet:
+    context-path: /api
+spring:
+  application:
+    name: "calendar"
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
