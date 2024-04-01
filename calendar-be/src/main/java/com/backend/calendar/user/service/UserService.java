@@ -19,4 +19,8 @@ public class UserService {
 
         userRepository.save(userMapper.mapRegisterRequestToUser(request));
     }
+
+    public boolean checkIfEmailAvailable(String email) {
+        return userRepository.findUserByEmail(email).isEmpty();
+    }
 }
