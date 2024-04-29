@@ -9,6 +9,30 @@ import { Input } from "@/components/ui/input";
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 
+const validate = (
+  name: string,
+  surname: string,
+  password: string,
+): string | null => {
+  if (name.length < 2 || name.length > 50) {
+    return "Imię musi mieć od 2 do 50 znaków";
+  }
+
+  if (surname.length < 2 || surname.length > 50) {
+    return "Nazwisko musi mieć od 2 do 50 znaków";
+  }
+
+  if (password.length < 6) {
+    return "Hasło musi mieć co najmniej 6 znaków";
+  }
+
+  if (password.length > 60) {
+    return "Hasło nie może mieć więcej niż 60 znaków";
+  }
+
+  return null;
+};
+
 export default function FullForm({
   email,
   onCancel,
@@ -38,6 +62,15 @@ export default function FullForm({
     if (password != e.target.passwordConfirmation.value) {
       setError(true);
       setErrorMessage("Hasła nie są takie same");
+      setIsLoading(false);
+      return;
+    }
+
+    const error = validate(name, surname, password);
+
+    if (error) {
+      setError(true);
+      setErrorMessage(error);
       setIsLoading(false);
       return;
     }
