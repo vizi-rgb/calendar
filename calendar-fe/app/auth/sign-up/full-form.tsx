@@ -185,7 +185,12 @@ export default function FullForm({
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             <p className="px-2">Zarejestruj się</p>
           </Button>
-          <Button variant="outline" className="w-full" onClick={onCancel}>
+          <Button
+            variant="outline"
+            className="w-full"
+            disabled={isLoading}
+            onClick={onCancel}
+          >
             Powrót
           </Button>
         </div>
