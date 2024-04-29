@@ -19,6 +19,7 @@ export default function SignUpLayout({
             width="1000"
             height="1000"
             className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+            unoptimized={true}
           />
         </div>
       </div>

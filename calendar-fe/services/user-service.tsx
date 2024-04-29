@@ -1,6 +1,7 @@
 import axios, { AxiosPromise } from "axios";
 import endpoints from "../endpoints";
-import RegisterUserRequest from "@/services/dto/register-user-request";
+import UserResource from "@/services/dto/user-resource";
+import RegisterResponse from "@/services/dto/register-response";
 
 const userApiClient = axios.create({
   baseURL: endpoints.USER_URL,
@@ -14,8 +15,10 @@ const UserService = {
     return userApiClient.get(`/v1/email/${email}`);
   },
 
-  register: async (user: RegisterUserRequest) => {
-    return userApiClient.post("/v1/register", user);
+  register: async (user: UserResource) => {
+    return userApiClient.post<RegisterResponse>("/v1/register", user);
   },
+
+  getUser: (userId: string) => userApiClient.get<UserResource>(`/v1/${userId}`),
 };
 export default UserService;
