@@ -6,6 +6,7 @@ import com.backend.calendar.user.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/user")
 public class UserController {
 
@@ -35,6 +37,13 @@ public class UserController {
     @GetMapping("/v1/{userId}")
     public ResponseEntity<UserResource> getUser(@PathVariable UUID userId) {
         return ResponseEntity.ok().body(userService.getUser(userId));
+    }
+
+    @PostMapping("/v1/{userId}/verify/{token}")
+    public ResponseEntity<Void> verifyUser(@PathVariable UUID userId, @PathVariable UUID token) {
+        log.info("Verifying user with id {}", userId);
+        userService.verifyUser(userId, token);
+        return ResponseEntity.ok().build();
     }
 
 }

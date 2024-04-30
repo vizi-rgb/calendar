@@ -14,6 +14,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "users")
@@ -52,6 +53,10 @@ public class User implements UserDetails {
     @NotNull
     @Builder.Default
     private Boolean isEnabled = false;
+
+    @NotNull
+    @Builder.Default
+    private UUID emailVerificationToken = UUID.randomUUID();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
