@@ -68,7 +68,7 @@ export default function EmailForm({
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             <p className="px-2">Dalej</p>
           </Button>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" disabled={isLoading}>
             Zaloguj się z Google
           </Button>
         </div>

@@ -190,6 +190,7 @@ export default function FullForm({
             className="w-full"
             onClick={onCancel}
             disabled={isLoading}
+
           >
             Powrót
           </Button>
