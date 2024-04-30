@@ -20,5 +20,8 @@ const UserService = {
   },
 
   getUser: (userId: string) => userApiClient.get<UserResource>(`/v1/${userId}`),
+
+  verifyEmail: (userId: string, token: string) =>
+    userApiClient.post(`/v1/${userId}/verify/${token}`),
 };
 export default UserService;

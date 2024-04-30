@@ -188,8 +188,9 @@ export default function FullForm({
           <Button
             variant="outline"
             className="w-full"
-            disabled={isLoading}
             onClick={onCancel}
+            disabled={isLoading}
+
           >
             Powrót
           </Button>
