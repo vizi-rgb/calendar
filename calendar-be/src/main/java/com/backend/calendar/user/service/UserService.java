@@ -1,12 +1,17 @@
 package com.backend.calendar.user.service;
 
 import com.backend.calendar.mail.MailService;
+import com.backend.calendar.security.jwt.JwtService;
 import com.backend.calendar.user.domain.User;
+import com.backend.calendar.user.dto.AuthResponse;
+import com.backend.calendar.user.dto.LoginRequest;
 import com.backend.calendar.user.dto.RegisterRequest;
 import com.backend.calendar.user.dto.UserResource;
 import com.backend.calendar.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +26,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final MailService mailService;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     @Transactional
-    public UserResource registerUser(RegisterRequest request) {
+    public AuthResponse registerUser(RegisterRequest request) {
         if (userRepository.findUserByEmail(request.email()).isPresent()) {
             throw new IllegalArgumentException("User already exists");
         }
@@ -40,7 +47,24 @@ public class UserService {
         }
 
         sendVerificationEmail(user);
-        return userMapper.mapUserToUserResource(user);
+        final var jwt = jwtService.generateToken(user);
+        return userMapper.mapUserToAuthResponse(user, jwt);
+    }
+
+    @Transactional
+    public AuthResponse authenticateUser(LoginRequest loginRequest) {
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.email(),
+                loginRequest.password()
+            )
+        );
+
+        final var user = userRepository.findUserByEmail(loginRequest.email())
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        final var jwt = jwtService.generateToken(user);
+
+        return userMapper.mapUserToAuthResponse(user, jwt);
     }
 
     @Transactional(readOnly = true)

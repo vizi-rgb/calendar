@@ -1,6 +1,7 @@
 package com.backend.calendar.user.service;
 
 import com.backend.calendar.user.domain.User;
+import com.backend.calendar.user.dto.AuthResponse;
 import com.backend.calendar.user.dto.RegisterRequest;
 import com.backend.calendar.user.dto.UserResource;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,13 @@ public class UserMapper {
             .email(user.getEmail())
             .name(user.getName())
             .surname(user.getSurname())
+            .build();
+    }
+
+    public AuthResponse mapUserToAuthResponse(User user, String token) {
+        return AuthResponse.builder()
+            .userId(user.getUuid())
+            .token(token)
             .build();
     }
 }

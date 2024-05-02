@@ -1,5 +1,7 @@
 package com.backend.calendar.user.web;
 
+import com.backend.calendar.user.dto.AuthResponse;
+import com.backend.calendar.user.dto.LoginRequest;
 import com.backend.calendar.user.dto.RegisterRequest;
 import com.backend.calendar.user.dto.UserResource;
 import com.backend.calendar.user.service.UserService;
@@ -22,8 +24,14 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/v1/register")
-    public ResponseEntity<UserResource> registerUser(@RequestBody @Valid RegisterRequest registerRequest) {
+    public ResponseEntity<AuthResponse> registerUser(@RequestBody @Valid RegisterRequest registerRequest) {
         final var registerResponse = userService.registerUser(registerRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
+    }
+
+    @PostMapping("/v1/authenticate")
+    public ResponseEntity<AuthResponse> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
+        final var registerResponse = userService.authenticateUser(loginRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
     }
 
