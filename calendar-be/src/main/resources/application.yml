@@ -22,6 +22,11 @@ spring:
           starttls:
             enable: true
 
+app:
+  jwt:
+    key: X432eBc2i5mRYYKbkZk52uwFxOgo2lT3jHxyM13l1Yo=
+    algorithm: HS256
+
 
 logging:
   level:
