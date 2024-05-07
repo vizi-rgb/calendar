@@ -9,7 +9,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -36,8 +38,8 @@ public class JwtService {
         return Jwts.builder()
             .claims(extraClaims)
             .subject(userDetails.getUsername())
-            .issuedAt(Date.valueOf(LocalDate.now()))
-            .expiration(Date.valueOf(LocalDate.now().plusDays(1L)))
+            .issuedAt(Date.from(Instant.now()))
+            .expiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
             .signWith(jwtProperties.getKey())
             .compact();
     }
