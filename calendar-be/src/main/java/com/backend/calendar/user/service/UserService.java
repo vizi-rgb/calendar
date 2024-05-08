@@ -55,6 +55,14 @@ public class UserService {
 
     @Transactional
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
+        final var delay = new Random().nextInt(3000);
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException("Error while authenticating user");
+        }
+
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 loginRequest.email(),
@@ -67,6 +75,7 @@ public class UserService {
 
         final Map<String, Object> claim = Map.of("userId", user.getUuid());
         final var jwt = jwtService.generateToken(claim, user);
+
 
         return userMapper.mapUserToAuthResponse(user, jwt);
     }

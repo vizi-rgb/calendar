@@ -39,9 +39,7 @@ public class SecurityFilterChainConfig {
 
             .authorizeHttpRequests((auth) ->
                 auth
-                    .requestMatchers("/user/v1/register", "/user/v1/authenticate").permitAll()
-                    .requestMatchers("/user/v1/email/{email}").permitAll()
-                    .requestMatchers("/user/v1/{userId}/verify/{token}").permitAll()
+                    .requestMatchers("/user/v1/**").permitAll()
                     .anyRequest().authenticated()
             )
 
