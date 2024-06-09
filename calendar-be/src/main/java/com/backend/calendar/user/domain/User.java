@@ -58,6 +58,9 @@ public class User implements UserDetails {
     @Builder.Default
     private UUID emailVerificationToken = UUID.randomUUID();
 
+    @OneToOne
+    private RefreshToken refreshToken;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
