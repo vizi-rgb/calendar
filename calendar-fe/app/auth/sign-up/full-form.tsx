@@ -83,7 +83,8 @@ export default function FullForm({
         password: password,
       })
       .then((res) => {
-        const userId = res.data.userId;
+        const tokenPayload = atob(res.data.token.split(".")[1]);
+        const userId = JSON.parse(tokenPayload).userId;
         const url = `${path}/confirmation/${userId}`;
 
         router.push(url);
@@ -190,7 +191,6 @@ export default function FullForm({
             className="w-full"
             onClick={onCancel}
             disabled={isLoading}
-
           >
             Powrót
           </Button>

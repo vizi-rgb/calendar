@@ -4,6 +4,7 @@ import userService from "@/services/user-service";
 import UserResource from "@/services/dto/user-resource";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function EmailVerificationConfirmation({
   params,
@@ -13,6 +14,8 @@ export default function EmailVerificationConfirmation({
   const [user, setUser] = useState<UserResource | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const router = useRouter();
 
   useEffect(() => {
     userService
@@ -46,7 +49,12 @@ export default function EmailVerificationConfirmation({
             <>
               <p>Twój adres {user?.email} został pomyślnie zweryfikowany.</p>
               <hr />
-              <Button variant={"outline"}>Przejdź do logowania</Button>
+              <Button
+                variant={"outline"}
+                onClick={() => router.push("/auth/sign-in")}
+              >
+                Przejdź do logowania
+              </Button>
             </>
           ) : (
             <Button variant={"outline"} disabled={isLoading}>

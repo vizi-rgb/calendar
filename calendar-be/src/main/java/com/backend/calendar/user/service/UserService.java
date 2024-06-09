@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -35,7 +36,7 @@ public class UserService {
             throw new IllegalArgumentException("User already exists");
         }
 
-        final var delay = new Random().nextInt(5000);
+        final var delay = new Random().nextInt(3000);
         User user = null;
 
         try {
@@ -47,12 +48,21 @@ public class UserService {
         }
 
         sendVerificationEmail(user);
-        final var jwt = jwtService.generateToken(user);
+        final Map<String, Object> claim = Map.of("userId", user.getUuid());
+        final var jwt = jwtService.generateToken(claim, user);
         return userMapper.mapUserToAuthResponse(user, jwt);
     }
 
     @Transactional
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
+        final var delay = new Random().nextInt(3000);
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException("Error while authenticating user");
+        }
+
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 loginRequest.email(),
@@ -62,7 +72,10 @@ public class UserService {
 
         final var user = userRepository.findUserByEmail(loginRequest.email())
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        final var jwt = jwtService.generateToken(user);
+
+        final Map<String, Object> claim = Map.of("userId", user.getUuid());
+        final var jwt = jwtService.generateToken(claim, user);
+
 
         return userMapper.mapUserToAuthResponse(user, jwt);
     }

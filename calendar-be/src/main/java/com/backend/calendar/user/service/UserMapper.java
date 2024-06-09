@@ -41,7 +41,6 @@ public class UserMapper {
 
     public AuthResponse mapUserToAuthResponse(User user, String token) {
         return AuthResponse.builder()
-            .userId(user.getUuid())
             .token(token)
             .build();
     }
