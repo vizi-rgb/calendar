@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -20,11 +21,28 @@ public class RefreshToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
     @EqualsAndHashCode.Include
     private String currentToken;
 
     @NotNull
-    @OneToMany
-    private Set<RefreshToken> tokenFamily;
+    @ElementCollection
+    @Builder.Default
+    private Set<String> tokenFamily = Set.of();
+
+    public Optional<String> getCurrentToken() {
+        return Optional.ofNullable(currentToken);
+    }
+
+    public void addToTokenFamily(String previousToken) {
+        tokenFamily.add(previousToken);
+    }
+
+    public void clearTokenFamily() {
+        tokenFamily.clear();
+    }
+
+    public void invalidate() {
+        currentToken = null;
+        tokenFamily.clear();
+    }
 }

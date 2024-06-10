@@ -39,9 +39,10 @@ public class UserMapper {
             .build();
     }
 
-    public AuthResponse mapUserToAuthResponse(User user, String token) {
+    public AuthResponse mapUserToAuthResponse(String token, String refreshToken) {
         return AuthResponse.builder()
             .token(token)
+            .refreshToken(refreshToken)
             .build();
     }
 }

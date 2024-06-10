@@ -17,6 +17,8 @@ public class JwtProperties {
 
     private String key;
     private String algorithm;
+    private Long accessTokenExpiration;
+    private Long refreshTokenExpiration;
 
     public SecretKey getKey() {
         byte[] keyBytes = Base64.getDecoder().decode(key);

@@ -2,6 +2,7 @@ package com.backend.calendar.user.service;
 
 import com.backend.calendar.mail.MailService;
 import com.backend.calendar.security.jwt.JwtService;
+import com.backend.calendar.user.domain.RefreshToken;
 import com.backend.calendar.user.domain.User;
 import com.backend.calendar.user.dto.AuthResponse;
 import com.backend.calendar.user.dto.LoginRequest;
@@ -15,7 +16,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -43,14 +43,12 @@ public class UserService {
             Thread.sleep(delay);
             user = userRepository.save(userMapper.mapRegisterRequestToUser(request));
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("Error while saving user", e);
             throw new IllegalArgumentException("Error while saving user");
         }
 
         sendVerificationEmail(user);
-        final Map<String, Object> claim = Map.of("userId", user.getUuid());
-        final var jwt = jwtService.generateToken(claim, user);
-        return userMapper.mapUserToAuthResponse(user, jwt);
+        return generateAuthResponse(user);
     }
 
     @Transactional
@@ -59,7 +57,7 @@ public class UserService {
         try {
             Thread.sleep(delay);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("Error while authenticating user", e);
             throw new IllegalArgumentException("Error while authenticating user");
         }
 
@@ -73,11 +71,7 @@ public class UserService {
         final var user = userRepository.findUserByEmail(loginRequest.email())
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        final Map<String, Object> claim = Map.of("userId", user.getUuid());
-        final var jwt = jwtService.generateToken(claim, user);
-
-
-        return userMapper.mapUserToAuthResponse(user, jwt);
+        return generateAuthResponse(user);
     }
 
     @Transactional(readOnly = true)
@@ -100,6 +94,7 @@ public class UserService {
         log.info("Verifying user with id {}", userId);
         log.info("Token: {}", token);
         log.info("EmailToken: {}", user.getEmailVerificationToken());
+
         if (!user.getEmailVerificationToken().equals(token)) {
             throw new IllegalArgumentException("Invalid token");
         }
@@ -121,5 +116,33 @@ public class UserService {
         );
 
         mailService.sendMail(user.getEmail(), subject, text);
+    }
+
+    private RefreshToken putRefreshTokenIfAbsent(User user, String refreshToken) {
+        final var refreshTokenContainer = user.getRefreshToken();
+
+        if (refreshTokenContainer != null) {
+            return refreshTokenContainer;
+        }
+
+        final var token = RefreshToken.builder()
+            .currentToken(refreshToken)
+            .build();
+
+        user.setRefreshToken(token);
+        return null;
+    }
+
+    private AuthResponse generateAuthResponse(User user) {
+        final var jwt = jwtService.generateToken(user);
+        final var refreshToken = jwtService.generateRefreshToken(user);
+
+        final var userToken = putRefreshTokenIfAbsent(user, refreshToken);
+        if (userToken != null) {
+            userToken.clearTokenFamily();
+            userToken.setCurrentToken(refreshToken);
+        }
+
+        return userMapper.mapUserToAuthResponse(jwt, refreshToken);
     }
 }

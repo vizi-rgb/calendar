@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -34,12 +33,28 @@ public class JwtService {
         return generateToken(Map.of(), userDetails);
     }
 
+    public String generateRefreshToken(UserDetails userDetails) {
+        return generateToken(
+            Map.of(),
+            userDetails,
+            jwtProperties.getRefreshTokenExpiration()
+        );
+    }
+
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return generateToken(
+            extraClaims,
+            userDetails,
+            jwtProperties.getAccessTokenExpiration()
+        );
+    }
+
+    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, Long seconds) {
         return Jwts.builder()
             .claims(extraClaims)
             .subject(userDetails.getUsername())
             .issuedAt(Date.from(Instant.now()))
-            .expiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
+            .expiration(Date.from(Instant.now().plusSeconds(seconds)))
             .signWith(jwtProperties.getKey())
             .compact();
     }

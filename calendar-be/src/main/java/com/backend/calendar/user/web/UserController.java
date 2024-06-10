@@ -32,7 +32,7 @@ public class UserController {
     @PostMapping("/v1/authenticate")
     public ResponseEntity<AuthResponse> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
         final var registerResponse = userService.authenticateUser(loginRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
+        return ResponseEntity.ok(registerResponse);
     }
 
     @GetMapping("/v1/email/{email}")

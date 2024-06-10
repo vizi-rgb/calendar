@@ -58,8 +58,9 @@ public class User implements UserDetails {
     @Builder.Default
     private UUID emailVerificationToken = UUID.randomUUID();
 
-    @OneToOne
-    private RefreshToken refreshToken;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private RefreshToken refreshToken = new RefreshToken();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
