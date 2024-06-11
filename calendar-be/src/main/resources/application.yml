@@ -8,7 +8,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
   mail:
     default-encoding: UTF-8
     port: 587
@@ -26,6 +26,8 @@ app:
   jwt:
     key: X432eBc2i5mRYYKbkZk52uwFxOgo2lT3jHxyM13l1Yo=
     algorithm: HS256
+    accessTokenExpiration: 900
+    refreshTokenExpiration: 86400
 
 
 logging:

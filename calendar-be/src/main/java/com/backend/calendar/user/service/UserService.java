@@ -2,12 +2,14 @@ package com.backend.calendar.user.service;
 
 import com.backend.calendar.mail.MailService;
 import com.backend.calendar.security.jwt.JwtService;
+import com.backend.calendar.user.domain.RefreshToken;
 import com.backend.calendar.user.domain.User;
 import com.backend.calendar.user.dto.AuthResponse;
 import com.backend.calendar.user.dto.LoginRequest;
 import com.backend.calendar.user.dto.RegisterRequest;
 import com.backend.calendar.user.dto.UserResource;
 import com.backend.calendar.user.repository.UserRepository;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -36,33 +37,17 @@ public class UserService {
             throw new IllegalArgumentException("User already exists");
         }
 
-        final var delay = new Random().nextInt(3000);
-        User user = null;
-
-        try {
-            Thread.sleep(delay);
-            user = userRepository.save(userMapper.mapRegisterRequestToUser(request));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("Error while saving user");
-        }
-
+        final var user = userRepository.save(userMapper.mapRegisterRequestToUser(request));
         sendVerificationEmail(user);
-        final Map<String, Object> claim = Map.of("userId", user.getUuid());
-        final var jwt = jwtService.generateToken(claim, user);
-        return userMapper.mapUserToAuthResponse(user, jwt);
+        final var authResponse = generateAuthResponse(user);
+        setNewRefreshToken(user, authResponse.refreshToken());
+        userRepository.save(user);
+
+        return authResponse;
     }
 
     @Transactional
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
-        final var delay = new Random().nextInt(3000);
-        try {
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("Error while authenticating user");
-        }
-
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 loginRequest.email(),
@@ -73,11 +58,11 @@ public class UserService {
         final var user = userRepository.findUserByEmail(loginRequest.email())
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        final Map<String, Object> claim = Map.of("userId", user.getUuid());
-        final var jwt = jwtService.generateToken(claim, user);
+        final var authResponse = generateAuthResponse(user);
+        setNewRefreshToken(user, authResponse.refreshToken());
+        userRepository.save(user);
 
-
-        return userMapper.mapUserToAuthResponse(user, jwt);
+        return authResponse;
     }
 
     @Transactional(readOnly = true)
@@ -100,12 +85,53 @@ public class UserService {
         log.info("Verifying user with id {}", userId);
         log.info("Token: {}", token);
         log.info("EmailToken: {}", user.getEmailVerificationToken());
+
         if (!user.getEmailVerificationToken().equals(token)) {
             throw new IllegalArgumentException("Invalid token");
         }
 
         user.setIsEnabled(true);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public AuthResponse refreshToken(String refreshToken) {
+        try {
+            final var userEmail = jwtService.extractEmail(refreshToken);
+            final var user = userRepository.findUserByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            final var userRefreshToken = user.getRefreshToken();
+
+            if (userRefreshToken == null) {
+                throw new IllegalArgumentException("Invalid token");
+            }
+
+            final var isTokenValid = userRefreshToken
+                .getCurrentToken()
+                .map(
+                    token ->
+                        token.equals(refreshToken) && !jwtService.isTokenExpired(refreshToken)
+                )
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
+
+            if (userRefreshToken.tokenInTokenFamily(refreshToken)) {
+                log.info("Token is in token family, invalidating...");
+                userRefreshToken.invalidate();
+                throw new IllegalArgumentException("Invalid token");
+            }
+
+            if (!isTokenValid) {
+                throw new IllegalArgumentException("Invalid token");
+            }
+
+            final var authResponse = generateAuthResponse(user);
+            userRefreshToken.rotateToken(authResponse.refreshToken());
+            userRepository.save(user);
+
+            return authResponse;
+        } catch (JwtException e) {
+            throw new IllegalArgumentException("Invalid token");
+        }
     }
 
     private void sendVerificationEmail(User user) {
@@ -121,5 +147,36 @@ public class UserService {
         );
 
         mailService.sendMail(user.getEmail(), subject, text);
+    }
+
+    private RefreshToken putRefreshTokenIfAbsent(User user, String refreshToken) {
+        final var refreshTokenContainer = user.getRefreshToken();
+
+        if (refreshTokenContainer != null) {
+            return refreshTokenContainer;
+        }
+
+        final var token = RefreshToken.builder()
+            .currentToken(refreshToken)
+            .build();
+
+        user.setRefreshToken(token);
+        return null;
+    }
+
+    private AuthResponse generateAuthResponse(User user) {
+        final var extraClaims = Map.of("userId", (Object) user.getUuid().toString());
+        final var jwt = jwtService.generateToken(extraClaims, user);
+        final var refreshToken = jwtService.generateRefreshToken(user);
+
+        return userMapper.mapUserToAuthResponse(jwt, refreshToken);
+    }
+
+    private void setNewRefreshToken(User user, String refreshToken) {
+        final var previousToken = putRefreshTokenIfAbsent(user, refreshToken);
+        if (previousToken != null) {
+            previousToken.clearTokenFamily();
+            previousToken.setCurrentToken(refreshToken);
+        }
     }
 }
