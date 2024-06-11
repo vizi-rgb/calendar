@@ -1,10 +1,7 @@
 package com.backend.calendar.user.web;
 
 import com.backend.calendar.security.jwt.JwtProperties;
-import com.backend.calendar.user.dto.AuthResponse;
-import com.backend.calendar.user.dto.LoginRequest;
-import com.backend.calendar.user.dto.RegisterRequest;
-import com.backend.calendar.user.dto.UserResource;
+import com.backend.calendar.user.dto.*;
 import com.backend.calendar.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,7 +25,7 @@ public class UserController {
     private final JwtProperties jwtProperties;
 
     @PostMapping("/v1/register")
-    public ResponseEntity<AuthResponse> registerUser(
+    public ResponseEntity<TokenContainer> registerUser(
         HttpServletResponse response,
         @RequestBody @Valid RegisterRequest registerRequest
     ) {
@@ -36,13 +33,23 @@ public class UserController {
 
         log.info("Setting cookie for user {}", registerRequest.email());
         setCookie(response, registerResponse);
-        return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new TokenContainer(registerResponse.token()));
     }
 
     @PostMapping("/v1/authenticate")
-    public ResponseEntity<AuthResponse> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
+    public ResponseEntity<TokenContainer> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
         final var registerResponse = userService.authenticateUser(loginRequest);
-        return ResponseEntity.ok(registerResponse);
+        return ResponseEntity.ok(new TokenContainer(registerResponse.token()));
+    }
+
+    @PostMapping("/v1/refresh")
+    public ResponseEntity<TokenContainer> refreshToken(
+        HttpServletResponse response,
+        @CookieValue(name = "refresh_token") String refreshToken
+    ) {
+        final var authResponse = userService.refreshToken(refreshToken);
+        setCookie(response, authResponse);
+        return ResponseEntity.ok(new TokenContainer(authResponse.token()));
     }
 
     @GetMapping("/v1/email/{email}")
@@ -66,7 +73,7 @@ public class UserController {
 
     private void setCookie(HttpServletResponse response, AuthResponse authResponse) {
         final var cookie = new Cookie("refresh_token", authResponse.refreshToken());
-        setCookieAttributes(cookie, "/refresh", jwtProperties.getRefreshTokenExpiration().intValue());
+        setCookieAttributes(cookie, "/api/user/v1/refresh", jwtProperties.getRefreshTokenExpiration().intValue());
         response.addCookie(cookie);
     }
 

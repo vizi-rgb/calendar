@@ -41,6 +41,18 @@ public class RefreshToken {
         tokenFamily.clear();
     }
 
+    public void rotateToken(String newToken) {
+        if (currentToken != null) {
+            addToTokenFamily(currentToken);
+        }
+
+        currentToken = newToken;
+    }
+
+    public boolean tokenInTokenFamily(String token) {
+        return tokenFamily.contains(token);
+    }
+
     public void invalidate() {
         currentToken = null;
         tokenFamily.clear();

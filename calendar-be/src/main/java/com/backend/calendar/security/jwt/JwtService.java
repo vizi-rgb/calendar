@@ -69,17 +69,11 @@ public class JwtService {
         return expiration.before(Date.valueOf(LocalDate.now()));
     }
 
-    private Claims extractClaims(String jwt) {
-        Jws<Claims> parsedJwt;
-
-        try {
-            parsedJwt = Jwts.parser()
-                .verifyWith(jwtProperties.getKey())
-                .build()
-                .parseSignedClaims(jwt);
-        } catch (JwtException e) {
-            throw new JwtException("Invalid JWT token");
-        }
+    private Claims extractClaims(String jwt) throws JwtException {
+        final Jws<Claims> parsedJwt = Jwts.parser()
+            .verifyWith(jwtProperties.getKey())
+            .build()
+            .parseSignedClaims(jwt);
 
         return parsedJwt.getPayload();
     }

@@ -9,6 +9,7 @@ import com.backend.calendar.user.dto.LoginRequest;
 import com.backend.calendar.user.dto.RegisterRequest;
 import com.backend.calendar.user.dto.UserResource;
 import com.backend.calendar.user.repository.UserRepository;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -37,31 +37,17 @@ public class UserService {
             throw new IllegalArgumentException("User already exists");
         }
 
-        final var delay = new Random().nextInt(3000);
-        User user = null;
-
-        try {
-            Thread.sleep(delay);
-            user = userRepository.save(userMapper.mapRegisterRequestToUser(request));
-        } catch (InterruptedException e) {
-            log.error("Error while saving user", e);
-            throw new IllegalArgumentException("Error while saving user");
-        }
-
+        final var user = userRepository.save(userMapper.mapRegisterRequestToUser(request));
         sendVerificationEmail(user);
-        return generateAuthResponse(user);
+        final var authResponse = generateAuthResponse(user);
+        setNewRefreshToken(user, authResponse.refreshToken());
+        userRepository.save(user);
+
+        return authResponse;
     }
 
     @Transactional
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
-        final var delay = new Random().nextInt(3000);
-        try {
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            log.error("Error while authenticating user", e);
-            throw new IllegalArgumentException("Error while authenticating user");
-        }
-
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 loginRequest.email(),
@@ -72,7 +58,11 @@ public class UserService {
         final var user = userRepository.findUserByEmail(loginRequest.email())
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        return generateAuthResponse(user);
+        final var authResponse = generateAuthResponse(user);
+        setNewRefreshToken(user, authResponse.refreshToken());
+        userRepository.save(user);
+
+        return authResponse;
     }
 
     @Transactional(readOnly = true)
@@ -102,6 +92,46 @@ public class UserService {
 
         user.setIsEnabled(true);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public AuthResponse refreshToken(String refreshToken) {
+        try {
+            final var userEmail = jwtService.extractEmail(refreshToken);
+            final var user = userRepository.findUserByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            final var userRefreshToken = user.getRefreshToken();
+
+            if (userRefreshToken == null) {
+                throw new IllegalArgumentException("Invalid token");
+            }
+
+            final var isTokenValid = userRefreshToken
+                .getCurrentToken()
+                .map(
+                    token ->
+                        token.equals(refreshToken) && !jwtService.isTokenExpired(refreshToken)
+                )
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
+
+            if (userRefreshToken.tokenInTokenFamily(refreshToken)) {
+                log.info("Token is in token family, invalidating...");
+                userRefreshToken.invalidate();
+                throw new IllegalArgumentException("Invalid token");
+            }
+
+            if (!isTokenValid) {
+                throw new IllegalArgumentException("Invalid token");
+            }
+
+            final var authResponse = generateAuthResponse(user);
+            userRefreshToken.rotateToken(authResponse.refreshToken());
+            userRepository.save(user);
+
+            return authResponse;
+        } catch (JwtException e) {
+            throw new IllegalArgumentException("Invalid token");
+        }
     }
 
     private void sendVerificationEmail(User user) {
@@ -139,12 +169,14 @@ public class UserService {
         final var jwt = jwtService.generateToken(extraClaims, user);
         final var refreshToken = jwtService.generateRefreshToken(user);
 
-        final var userToken = putRefreshTokenIfAbsent(user, refreshToken);
-        if (userToken != null) {
-            userToken.clearTokenFamily();
-            userToken.setCurrentToken(refreshToken);
-        }
-
         return userMapper.mapUserToAuthResponse(jwt, refreshToken);
+    }
+
+    private void setNewRefreshToken(User user, String refreshToken) {
+        final var previousToken = putRefreshTokenIfAbsent(user, refreshToken);
+        if (previousToken != null) {
+            previousToken.clearTokenFamily();
+            previousToken.setCurrentToken(refreshToken);
+        }
     }
 }
