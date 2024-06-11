@@ -16,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -134,7 +135,8 @@ public class UserService {
     }
 
     private AuthResponse generateAuthResponse(User user) {
-        final var jwt = jwtService.generateToken(user);
+        final var extraClaims = Map.of("userId", (Object) user.getUuid().toString());
+        final var jwt = jwtService.generateToken(extraClaims, user);
         final var refreshToken = jwtService.generateRefreshToken(user);
 
         final var userToken = putRefreshTokenIfAbsent(user, refreshToken);

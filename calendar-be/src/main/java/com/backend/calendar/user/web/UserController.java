@@ -1,10 +1,13 @@
 package com.backend.calendar.user.web;
 
+import com.backend.calendar.security.jwt.JwtProperties;
 import com.backend.calendar.user.dto.AuthResponse;
 import com.backend.calendar.user.dto.LoginRequest;
 import com.backend.calendar.user.dto.RegisterRequest;
 import com.backend.calendar.user.dto.UserResource;
 import com.backend.calendar.user.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +25,17 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    private final JwtProperties jwtProperties;
 
     @PostMapping("/v1/register")
-    public ResponseEntity<AuthResponse> registerUser(@RequestBody @Valid RegisterRequest registerRequest) {
+    public ResponseEntity<AuthResponse> registerUser(
+        HttpServletResponse response,
+        @RequestBody @Valid RegisterRequest registerRequest
+    ) {
         final var registerResponse = userService.registerUser(registerRequest);
+
+        log.info("Setting cookie for user {}", registerRequest.email());
+        setCookie(response, registerResponse);
         return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
     }
 
@@ -52,6 +62,19 @@ public class UserController {
         log.info("Verifying user with id {}", userId);
         userService.verifyUser(userId, token);
         return ResponseEntity.ok().build();
+    }
+
+    private void setCookie(HttpServletResponse response, AuthResponse authResponse) {
+        final var cookie = new Cookie("refresh_token", authResponse.refreshToken());
+        setCookieAttributes(cookie, "/refresh", jwtProperties.getRefreshTokenExpiration().intValue());
+        response.addCookie(cookie);
+    }
+
+    private void setCookieAttributes(Cookie cookie, String path, Integer maxAge) {
+        cookie.setSecure(true);
+        cookie.setPath(path);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(maxAge);
     }
 
 }
