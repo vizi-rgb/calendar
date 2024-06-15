@@ -78,10 +78,16 @@ function DropdownForAvatar() {
   );
 }
 
-export default function AvatarWithName() {
+export default function AvatarWithName({
+  name,
+  surname,
+}: {
+  name: string;
+  surname: string;
+}) {
   return (
     <div className="flex flex-row items-center gap-x-2.5">
-      <small>Cristiano Ronaldo</small>
+      <small>{`${name} ${surname}`}</small>
       <DropdownForAvatar />
     </div>
   );

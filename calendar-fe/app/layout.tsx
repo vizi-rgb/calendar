@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Inter as FontSans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import StoreProvider from "@/app/store-provider";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -14,6 +15,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const clientId: string = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!;
+
   return (
     <html lang="pl" suppressHydrationWarning>
       <body
@@ -28,7 +31,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <StoreProvider>{children}</StoreProvider>
+          <StoreProvider>
+            <GoogleOAuthProvider clientId={clientId}>
+              {children}
+            </GoogleOAuthProvider>
+          </StoreProvider>
         </ThemeProvider>
       </body>
     </html>

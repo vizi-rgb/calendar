@@ -1,9 +1,11 @@
 package com.backend.calendar.user.service;
 
+import com.backend.calendar.oauth.OauthProvider;
 import com.backend.calendar.user.domain.User;
 import com.backend.calendar.user.dto.AuthResponse;
 import com.backend.calendar.user.dto.RegisterRequest;
 import com.backend.calendar.user.dto.UserResource;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,20 @@ public class UserMapper {
             .name(request.name())
             .surname(request.surname())
             .password(encodedPassword)
+            .build();
+    }
+
+    public User mapGoogleIdTokenToUser(GoogleIdToken.Payload googleIdToken) {
+        final var uuid = UUID.nameUUIDFromBytes(googleIdToken.getEmail().getBytes(StandardCharsets.UTF_8));
+
+        return User.builder()
+            .uuid(uuid)
+            .email(googleIdToken.getEmail())
+            .name(googleIdToken.get("given_name").toString())
+            .surname(googleIdToken.get("family_name").toString())
+            .isEnabled(googleIdToken.getEmailVerified())
+            .oauthProvider(OauthProvider.GOOGLE)
+            .password("")
             .build();
     }
 

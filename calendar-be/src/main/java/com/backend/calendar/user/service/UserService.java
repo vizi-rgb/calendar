@@ -1,13 +1,11 @@
 package com.backend.calendar.user.service;
 
 import com.backend.calendar.mail.MailService;
+import com.backend.calendar.oauth.OauthProvider;
 import com.backend.calendar.security.jwt.JwtService;
 import com.backend.calendar.user.domain.RefreshToken;
 import com.backend.calendar.user.domain.User;
-import com.backend.calendar.user.dto.AuthResponse;
-import com.backend.calendar.user.dto.LoginRequest;
-import com.backend.calendar.user.dto.RegisterRequest;
-import com.backend.calendar.user.dto.UserResource;
+import com.backend.calendar.user.dto.*;
 import com.backend.calendar.user.repository.UserRepository;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +28,7 @@ public class UserService {
     private final MailService mailService;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final GoogleTokenService googleTokenService;
 
     @Transactional
     public AuthResponse registerUser(RegisterRequest request) {
@@ -132,6 +131,30 @@ public class UserService {
         } catch (JwtException e) {
             throw new IllegalArgumentException("Invalid token");
         }
+    }
+
+    public AuthResponse authenticateWithGoogle(GoogleAuthRequest googleAuthRequest) {
+        if (!googleTokenService.isTokenValid(googleAuthRequest.idToken())) {
+            throw new IllegalArgumentException("Invalid token");
+        }
+
+        final var idToken = googleTokenService.extractPayload(googleAuthRequest.idToken());
+        final var user = userRepository.findUserByEmail(idToken.getEmail())
+            .orElseGet(() -> userRepository.save(userMapper.mapGoogleIdTokenToUser(idToken)));
+
+        final var oauthProvider = user.getOauthProvider();
+        if (oauthProvider == null || !oauthProvider.equals(OauthProvider.GOOGLE)) {
+            throw new IllegalArgumentException("User already exists");
+        }
+
+        if (!user.getIsEnabled()) {
+            sendVerificationEmail(user);
+        }
+
+        final var authResponse = generateAuthResponse(user);
+        setNewRefreshToken(user, authResponse.refreshToken());
+
+        return authResponse;
     }
 
     private void sendVerificationEmail(User user) {

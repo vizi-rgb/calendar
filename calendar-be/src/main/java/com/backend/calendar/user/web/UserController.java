@@ -71,6 +71,16 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/oauth2/v1/google")
+    public ResponseEntity<TokenContainer> authenticateWithGoogle(
+        HttpServletResponse response,
+        @RequestBody @Valid GoogleAuthRequest googleAuthRequest
+    ) {
+        final var authResponse = userService.authenticateWithGoogle(googleAuthRequest);
+        setCookie(response, authResponse);
+        return ResponseEntity.ok(new TokenContainer(authResponse.token()));
+    }
+
     private void setCookie(HttpServletResponse response, AuthResponse authResponse) {
         final var cookie = new Cookie("refresh_token", authResponse.refreshToken());
         setCookieAttributes(cookie, "/api/user/v1/refresh", jwtProperties.getRefreshTokenExpiration().intValue());
