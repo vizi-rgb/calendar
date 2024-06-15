@@ -1,4 +1,4 @@
-package com.backend.calendar.user.service;
+package com.backend.calendar.oauth.service;
 
 import com.backend.calendar.oauth.config.GoogleAuthProperties;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
