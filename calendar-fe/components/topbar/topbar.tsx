@@ -10,7 +10,7 @@ import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { Command, CommandInput } from "@/components/ui/command";
 import AvatarWithName from "@/components/topbar/avatar-with-name";
 import DatePicker from "@/components/topbar/date-picker";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { toggleSidebar } from "@/lib/features/sidebar/sidebar-slice";
 import TimelineSelect from "@/components/topbar/timeline-select";
 
@@ -43,6 +43,7 @@ function CommandWrapper() {
 
 export default function Topbar() {
   const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.authorization.user);
 
   const handleHamburgerClick = () => {
     dispatch(toggleSidebar());
@@ -65,7 +66,7 @@ export default function Topbar() {
         <div className="flex flex-row items-center justify-self-end gap-x-10">
           <CreateButton />
           <IconButtons />
-          <AvatarWithName />
+          <AvatarWithName name={user?.name} surname={user?.surname} />
         </div>
       </div>
     </div>

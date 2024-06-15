@@ -14,8 +14,18 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAppDispatch } from "@/lib/hooks";
+import { clearAuthorizedUser } from "@/lib/features/authorization/authorization-slice";
+import { useRouter } from "next/navigation";
 
 function DropdownForAvatar() {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const handleLogout = () => {
+    router.push("/auth/sign-in");
+    dispatch(clearAuthorizedUser());
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -69,8 +79,8 @@ function DropdownForAvatar() {
         <DropdownMenuItem>Support</DropdownMenuItem>
         <DropdownMenuItem disabled>API</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          Log out
+        <DropdownMenuItem onClick={handleLogout}>
+          Wyloguj się
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -78,10 +88,16 @@ function DropdownForAvatar() {
   );
 }
 
-export default function AvatarWithName() {
+export default function AvatarWithName({
+  name,
+  surname,
+}: {
+  name: string | undefined;
+  surname: string | undefined;
+}) {
   return (
     <div className="flex flex-row items-center gap-x-2.5">
-      <small>Cristiano Ronaldo</small>
+      <small>{`${name ?? ""} ${surname ?? ""}`}</small>
       <DropdownForAvatar />
     </div>
   );

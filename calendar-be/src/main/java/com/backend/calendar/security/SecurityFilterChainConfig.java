@@ -40,13 +40,16 @@ public class SecurityFilterChainConfig {
             .authorizeHttpRequests((auth) ->
                 auth
                     .requestMatchers("/user/v1/**").permitAll()
+                    .requestMatchers("/user/oauth2/**").permitAll()
                     .anyRequest().authenticated()
             )
 
             .addFilterBefore(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class
-            );
+            )
+
+            .oauth2Login(AbstractHttpConfigurer::disable);
 
         return http.build();
     }

@@ -1,6 +1,7 @@
 package com.backend.calendar.user.domain;
 
 
+import com.backend.calendar.oauth.OauthProvider;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -37,6 +38,9 @@ public class User implements UserDetails {
 
     @NotNull
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private OauthProvider oauthProvider;
 
     @NotNull
     @Builder.Default

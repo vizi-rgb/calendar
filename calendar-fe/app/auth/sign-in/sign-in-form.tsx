@@ -11,6 +11,7 @@ import { LoginRequest } from "@/services/dto/login-request";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import GoogleSignInButton from "@/app/auth/google-signin-button";
 
 export default function SignInForm() {
   const [error, setError] = useState(false);
@@ -36,7 +37,6 @@ export default function SignInForm() {
     userService
       .login(credentials)
       .then((response) => {
-        console.log(response.data);
         router.push("/calendar");
       })
       .catch((error) => {
@@ -101,9 +101,11 @@ export default function SignInForm() {
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             <p className="px-2">Zaloguj się</p>
           </Button>
-          <Button variant="outline" className="w-full" disabled={isLoading}>
-            Zaloguj się z Google
-          </Button>
+          <GoogleSignInButton
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            callback={() => router.push("/calendar")}
+          />
         </div>
       </form>
       <div className="mt-4 text-center text-sm">
