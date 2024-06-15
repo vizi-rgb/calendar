@@ -16,14 +16,19 @@ const jwt = require("jsonwebtoken");
 
 export default function GoogleSignInButton({
   isLoading,
+  setIsLoading,
+  callback,
 }: {
   isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
+  callback: () => void;
 }) {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
+      setIsLoading(true);
       const googleTokenRequest: GoogleIdTokenRequest = {
         code: tokenResponse.code,
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
@@ -50,14 +55,15 @@ export default function GoogleSignInButton({
         })
         .then((authorizedUser) => {
           dispatch(storeAuthorizedUser(authorizedUser));
+          callback();
         })
         .catch((error) => {
+          setIsLoading(false);
           console.error("Error during authentication process:", error);
         });
-
-      router.push("/calendar");
     },
     onError: (error) => {
+      setIsLoading(false);
       console.error(error);
     },
     flow: "auth-code",

@@ -25,7 +25,6 @@ const authorizationSlice = createSlice({
       localStorage.setItem("user", JSON.stringify(action.payload.user));
     },
     clearAuthorizedUser(state) {
-      state.user = null;
       state.accessToken = null;
       localStorage.removeItem("accessToken");
       localStorage.removeItem("user");

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import GoogleSignInButton from "@/app/auth/google-signin-button";
+import { useRouter } from "next/navigation";
 
 export default function EmailForm({
   onSuccess,
@@ -18,6 +19,7 @@ export default function EmailForm({
   const [isEmailTaken, setIsEmailTaken] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const onEmailChange = (e: any) => {
     setEmail(e.target.value);
@@ -69,7 +71,11 @@ export default function EmailForm({
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             <p className="px-2">Dalej</p>
           </Button>
-          <GoogleSignInButton isLoading={isLoading} />
+          <GoogleSignInButton
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            callback={() => router.push("/calendar")}
+          />
         </div>
       </form>
     </>
