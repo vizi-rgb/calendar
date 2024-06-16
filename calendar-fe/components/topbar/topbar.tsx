@@ -66,7 +66,11 @@ export default function Topbar() {
         <div className="flex flex-row items-center justify-self-end gap-x-10">
           <CreateButton />
           <IconButtons />
-          <AvatarWithName name={user?.name} surname={user?.surname} />
+          <AvatarWithName
+            name={user?.name}
+            surname={user?.surname}
+            pictureUrl={user?.pictureUrl}
+          />
         </div>
       </div>
     </div>

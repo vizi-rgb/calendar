@@ -42,6 +42,7 @@ public class UserMapper {
             .surname(googleIdToken.get("family_name").toString())
             .isEnabled(googleIdToken.getEmailVerified())
             .oauthProvider(OauthProvider.GOOGLE)
+            .pictureUrl(googleIdToken.get("picture").toString())
             .password("")
             .build();
     }
@@ -52,6 +53,7 @@ public class UserMapper {
             .email(user.getEmail())
             .name(user.getName())
             .surname(user.getSurname())
+            .pictureUrl(user.getPictureUrl())
             .build();
     }
 
