@@ -42,6 +42,8 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private OauthProvider oauthProvider;
 
+    private String pictureUrl;
+
     @NotNull
     @Builder.Default
     private Boolean isAccountNonExpired = true;

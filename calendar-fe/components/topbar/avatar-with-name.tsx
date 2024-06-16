@@ -18,7 +18,15 @@ import { useAppDispatch } from "@/lib/hooks";
 import { clearAuthorizedUser } from "@/lib/features/authorization/authorization-slice";
 import { useRouter } from "next/navigation";
 
-function DropdownForAvatar() {
+function DropdownForAvatar({
+  name,
+  surname,
+  pictureUrl,
+}: {
+  name: string | undefined;
+  surname: string | undefined;
+  pictureUrl: string | undefined;
+}) {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const handleLogout = () => {
@@ -30,8 +38,8 @@ function DropdownForAvatar() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="size-10">
-          <AvatarImage src="https://pbs.twimg.com/media/FDN3LodUYAASbHm?format=jpg&name=4096x4096" />
-          <AvatarFallback>CR</AvatarFallback>
+          <AvatarImage src={pictureUrl} />
+          <AvatarFallback>{name?.at(0) + "" + surname?.at(0)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
@@ -91,14 +99,20 @@ function DropdownForAvatar() {
 export default function AvatarWithName({
   name,
   surname,
+  pictureUrl,
 }: {
   name: string | undefined;
   surname: string | undefined;
+  pictureUrl: string | undefined;
 }) {
   return (
     <div className="flex flex-row items-center gap-x-2.5">
       <small>{`${name ?? ""} ${surname ?? ""}`}</small>
-      <DropdownForAvatar />
+      <DropdownForAvatar
+        name={name}
+        surname={surname}
+        pictureUrl={pictureUrl}
+      />
     </div>
   );
 }

@@ -9,6 +9,7 @@ public record UserResource(
     UUID userId,
     String email,
     String name,
-    String surname
+    String surname,
+    String pictureUrl
 ) {
 }
