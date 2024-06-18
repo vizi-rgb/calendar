@@ -1,17 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 import User from "@/domain/User";
 
+let initialUser = localStorage.getItem("user");
+let initialAccessToken = localStorage.getItem("accessToken");
+
 interface AuthorizationState {
   user: User | null;
   accessToken: string | null;
 }
 
 const initialState: AuthorizationState = {
-  user: localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user") as string)
-    : null,
-
-  accessToken: localStorage.getItem("accessToken") ?? null,
+  user: initialUser ? JSON.parse(initialUser as string) : null,
+  accessToken: initialAccessToken ?? null,
 };
 
 const authorizationSlice = createSlice({

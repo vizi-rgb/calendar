@@ -5,9 +5,11 @@ export default function CalendarLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="px-5">
-      <Topbar />
-      <div className="flex flex-row py-2 gap-x-2">
+    <div className="px-5 h-screen flex flex-col">
+      <div className="grow-0 shrink-0">
+        <Topbar />
+      </div>
+      <div className="flex flex-row py-2 gap-x-2 flex-auto">
         <SideBar />
         {children}
       </div>

@@ -69,6 +69,7 @@ export default function Topbar() {
           <AvatarWithName
             name={user?.name}
             surname={user?.surname}
+            email={user?.email}
             pictureUrl={user?.pictureUrl}
           />
         </div>

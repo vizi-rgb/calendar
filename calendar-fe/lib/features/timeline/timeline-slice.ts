@@ -1,12 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { TimelineOption } from "@/components/topbar/timeline-select";
+import { TimelineOption } from "@/app/constants/timeline-option";
+
+let initialTimeline: TimelineOption =
+  (localStorage.getItem("timeline") as TimelineOption) ?? TimelineOption.Day;
 
 interface TimelineState {
   value: TimelineOption;
 }
 
 const initialState: TimelineState = {
-  value: TimelineOption.Day,
+  value: initialTimeline,
 };
 
 const timelineSlice = createSlice({
@@ -15,6 +18,7 @@ const timelineSlice = createSlice({
   reducers: {
     setTimeline(state, action: PayloadAction<TimelineOption>) {
       state.value = action.payload;
+      localStorage.setItem("timeline", action.payload);
     },
   },
 });

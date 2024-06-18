@@ -21,10 +21,12 @@ import { useRouter } from "next/navigation";
 function DropdownForAvatar({
   name,
   surname,
+  email,
   pictureUrl,
 }: {
   name: string | undefined;
   surname: string | undefined;
+  email: string | undefined;
   pictureUrl: string | undefined;
 }) {
   const dispatch = useAppDispatch();
@@ -43,7 +45,7 @@ function DropdownForAvatar({
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>Moje konto</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem>
@@ -99,10 +101,12 @@ function DropdownForAvatar({
 export default function AvatarWithName({
   name,
   surname,
+  email,
   pictureUrl,
 }: {
   name: string | undefined;
   surname: string | undefined;
+  email: string | undefined;
   pictureUrl: string | undefined;
 }) {
   return (
@@ -111,6 +115,7 @@ export default function AvatarWithName({
       <DropdownForAvatar
         name={name}
         surname={surname}
+        email={email}
         pictureUrl={pictureUrl}
       />
     </div>
