@@ -11,6 +11,11 @@ import { useState } from "react";
 import { format, setDefaultOptions } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { pl } from "date-fns/locale";
+import { useAppDispatch } from "@/lib/hooks";
+import {
+  nextMonth,
+  previousMonth,
+} from "@/lib/features/calendar/calendar-slice";
 
 function CalendarPopover() {
   const today = new Date();
@@ -45,13 +50,19 @@ function CalendarPopover() {
 }
 
 export default function DatePicker() {
+  const dispatch = useAppDispatch();
+
   return (
     <div className="flex flex-row items-center gap-x-0.5">
-      <Button variant="ghost" size="icon">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => dispatch(previousMonth())}
+      >
         <ChevronLeftIcon className="h-4 w-4" />
       </Button>
       <CalendarPopover />
-      <Button variant="ghost" size="icon">
+      <Button variant="ghost" size="icon" onClick={() => dispatch(nextMonth())}>
         <ChevronRightIcon className="h-4 w-4" />
       </Button>
     </div>

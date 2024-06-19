@@ -2,6 +2,7 @@
 import { useAppSelector } from "@/lib/hooks";
 import { TimelineOption } from "@/app/constants/timeline-option";
 import * as React from "react";
+import { cn } from "@/lib/utils";
 
 const days = [
   "Poniedziałek",
@@ -28,27 +29,38 @@ const months = [
   "Grudzień",
 ];
 
+const daysInMonth = (month: number, year: number) => {
+  return new Date(year, month, 0).getDate();
+};
+
 const range = (start: number, end: number) => {
   return Array.from({ length: end - start + 1 }, (_, i) => i + start);
 };
 
-const YearView = () => {
+const YearView = ({ date }: { date: Date }) => {
+  const month = date.getMonth();
+  const day = date.getDate();
   return (
     <div className="grid grid-cols-4 grid-rows-3 gap-20 h-full">
-      {range(0, 11).map((number) => (
+      {range(0, 11).map((monthNo) => (
         <div className="grid grid-cols-7 grid-rows-7">
-          <p className="col-span-7 font-bold border-b mb-1">{months[number]}</p>
+          <p className="col-span-7 font-bold border-b mb-1">
+            {months[monthNo]}
+          </p>
           {range(0, 6).map((number) => (
             <p className="text-center " key={number}>
               {days[number].at(0)}
             </p>
           ))}
-          {range(1, 35).map((number) => (
+          {range(1, 35).map((dayNo) => (
             <div
-              key={number}
-              className="hover:bg-accent transition-colors duration-100 ease-in rounded-lg flex flex-row justify-center items-center"
+              key={dayNo}
+              className={
+                "hover:font-bold cursor-pointer transition-colors duration-100 ease-in rounded-lg flex flex-row justify-center items-center" +
+                (dayNo === day && monthNo === month ? " bg-accent" : "")
+              }
             >
-              {number}
+              {dayNo}
             </div>
           ))}
         </div>
@@ -57,18 +69,50 @@ const YearView = () => {
   );
 };
 
-const MonthView = () => {
+const MonthView = ({ date }: { date: Date }) => {
+  const currentDate = new Date();
+
+  const month = date.getMonth();
+  const newDate = new Date(date);
+  newDate.setDate(1);
+
+  const daysInCurrentMonth = daysInMonth(month + 1, date.getFullYear());
+  const daysInPreviousMonth = daysInMonth(month, date.getFullYear());
+  const toFill = (6 + newDate.getDay()) % 7;
+  const startFromDay = daysInPreviousMonth - toFill + 1;
+  const rest = 35 - daysInCurrentMonth - toFill;
+
   return (
-    <div className="grid grid-cols-7 grid-rows-[auto_repeat(5,_minmax(0,_1fr))] h-full">
+    <div className="grid grid-cols-7 grid-rows-[auto_repeat(5,_minmax(0,_1fr))] h-full gap-px">
       {range(0, 6).map((number) => (
         <p key={number} className="p-2 font-bold border-b mb-1">
           {days[number]}
         </p>
       ))}
-      {range(1, 35).map((number) => (
+      {range(0, toFill - 1).map((number) => (
+        <div key={number} className="p-2 hover:bg-accent text-muted rounded-lg">
+          {startFromDay + number}
+        </div>
+      ))}
+      {range(1, daysInCurrentMonth).map((number) => (
         <div
           key={number}
-          className="p-2 hover:bg-accent transition-colors duration-100 ease-in rounded-lg"
+          className={cn(
+            "p-2 hover:bg-accent rounded-lg",
+            number == currentDate.getDate() &&
+              currentDate.getMonth() == date.getMonth() &&
+              currentDate.getFullYear() == date.getFullYear()
+              ? "bg-accent"
+              : "",
+          )}
+        >
+          {number}
+        </div>
+      ))}
+      {range(1, rest).map((number) => (
+        <div
+          key={number}
+          className={cn("p-2 hover:bg-accent text-muted rounded-lg")}
         >
           {number}
         </div>
@@ -95,13 +139,14 @@ const DayView = () => {
 };
 
 export default function CalendarViews() {
-  let selectedView = useAppSelector((state) => state.timeline.value);
+  let selectedView = useAppSelector((state) => state.calendar.timeline);
+  let date = useAppSelector((state) => state.calendar.date);
 
   switch (selectedView) {
     case TimelineOption.Year:
-      return <YearView />;
+      return <YearView date={date} />;
     case TimelineOption.Month:
-      return <MonthView />;
+      return <MonthView date={date} />;
     case TimelineOption.Day:
       return <DayView />;
     default:

@@ -2,7 +2,7 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import * as React from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { setTimeline } from "@/lib/features/timeline/timeline-slice";
+import { setTimeline } from "@/lib/features/calendar/calendar-slice";
 import { TimelineOption } from "@/app/constants/timeline-option";
 
 export default function TimelineSelect() {
@@ -10,7 +10,7 @@ export default function TimelineSelect() {
   const handleTimelineClick = (e: unknown, value: TimelineOption) => {
     dispatch(setTimeline(value));
   };
-  const value = useAppSelector((state) => state.timeline.value);
+  const value = useAppSelector((state) => state.calendar.timeline);
 
   const enumEntries = Object.entries(TimelineOption);
 
