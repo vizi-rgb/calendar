@@ -7,21 +7,22 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import * as React from "react";
-import { useState } from "react";
 import { format, setDefaultOptions } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { pl } from "date-fns/locale";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
   nextMonth,
   previousMonth,
 } from "@/lib/features/calendar/calendar-slice";
 
-function CalendarPopover() {
-  const today = new Date();
+function CalendarPopover({ inputDate }: { inputDate: Date }) {
+  const date = new Date(inputDate);
   setDefaultOptions({ locale: pl });
 
-  const [date, setDate] = useState<Date | undefined>(today);
+  console.log({ inputDate });
+
+  const doSomething = () => {};
 
   let formatDate = () => {
     if (!date) return;
@@ -34,7 +35,9 @@ function CalendarPopover() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant={"ghost"}>{formatDate()}</Button>
+        <Button className="w-32" variant={"ghost"}>
+          {formatDate()}
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
         <Calendar
@@ -42,7 +45,7 @@ function CalendarPopover() {
           mode="single"
           selected={date}
           initialFocus
-          onSelect={setDate}
+          onSelect={doSomething}
         />
       </PopoverContent>
     </Popover>
@@ -51,6 +54,7 @@ function CalendarPopover() {
 
 export default function DatePicker() {
   const dispatch = useAppDispatch();
+  let selectedDate = useAppSelector((state) => state.calendar.date);
 
   return (
     <div className="flex flex-row items-center gap-x-0.5">
@@ -61,7 +65,7 @@ export default function DatePicker() {
       >
         <ChevronLeftIcon className="h-4 w-4" />
       </Button>
-      <CalendarPopover />
+      <CalendarPopover inputDate={selectedDate} />
       <Button variant="ghost" size="icon" onClick={() => dispatch(nextMonth())}>
         <ChevronRightIcon className="h-4 w-4" />
       </Button>

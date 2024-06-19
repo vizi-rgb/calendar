@@ -29,12 +29,47 @@ const months = [
   "Grudzień",
 ];
 
+const enum DayType {
+  PREVIOUS,
+  CURRENT,
+  NEXT,
+}
+
 const daysInMonth = (month: number, year: number) => {
-  return new Date(year, month, 0).getDate();
+  return new Date(year, month + 1, 0).getDate();
 };
 
 const range = (start: number, end: number) => {
   return Array.from({ length: end - start + 1 }, (_, i) => i + start);
+};
+
+const calculateDayArray = (month: number, year: number) => {
+  const daysInCurrentMonth = daysInMonth(month, year);
+  const daysInPreviousMonth = daysInMonth(month - 1, year);
+
+  const newDate = new Date(year, month, 1);
+  const toFill = (6 + newDate.getDay()) % 7;
+
+  const rows = Math.ceil((daysInCurrentMonth + toFill) / 7);
+  const rest = rows * 7 - daysInCurrentMonth - toFill;
+  const calculatedArray: number[][] = [];
+
+  for (let i = 0; i < toFill; i++) {
+    calculatedArray.push([
+      daysInPreviousMonth - toFill + i + 1,
+      DayType.PREVIOUS,
+    ]);
+  }
+
+  for (let i = 1; i <= daysInCurrentMonth; i++) {
+    calculatedArray.push([i, DayType.CURRENT]);
+  }
+
+  for (let i = 1; i <= rest; i++) {
+    calculatedArray.push([i, DayType.NEXT]);
+  }
+
+  return calculatedArray;
 };
 
 const YearView = ({ date }: { date: Date }) => {
@@ -71,50 +106,38 @@ const YearView = ({ date }: { date: Date }) => {
 
 const MonthView = ({ date }: { date: Date }) => {
   const currentDate = new Date();
+  const daysArray = calculateDayArray(date.getMonth(), date.getFullYear());
+  let key = 1;
 
-  const month = date.getMonth();
-  const newDate = new Date(date);
-  newDate.setDate(1);
-
-  const daysInCurrentMonth = daysInMonth(month + 1, date.getFullYear());
-  const daysInPreviousMonth = daysInMonth(month, date.getFullYear());
-  const toFill = (6 + newDate.getDay()) % 7;
-  const startFromDay = daysInPreviousMonth - toFill + 1;
-  const rest = 35 - daysInCurrentMonth - toFill;
+  const isToday = (day: number, month: number) => {
+    return (
+      day === currentDate.getDate() &&
+      month === currentDate.getMonth() &&
+      date.getFullYear() === currentDate.getFullYear()
+    );
+  };
 
   return (
-    <div className="grid grid-cols-7 grid-rows-[auto_repeat(5,_minmax(0,_1fr))] h-full gap-px">
+    <div className="grid grid-cols-7 grid-rows-[auto] auto-rows-fr h-full gap-px">
       {range(0, 6).map((number) => (
         <p key={number} className="p-2 font-bold border-b mb-1">
           {days[number]}
         </p>
       ))}
-      {range(0, toFill - 1).map((number) => (
-        <div key={number} className="p-2 hover:bg-accent text-muted rounded-lg">
-          {startFromDay + number}
-        </div>
-      ))}
-      {range(1, daysInCurrentMonth).map((number) => (
+
+      {daysArray.map(([day, type]) => (
         <div
-          key={number}
+          key={key++}
           className={cn(
             "p-2 hover:bg-accent rounded-lg",
-            number == currentDate.getDate() &&
-              currentDate.getMonth() == date.getMonth() &&
-              currentDate.getFullYear() == date.getFullYear()
+            type === DayType.PREVIOUS ? "text-muted" : "",
+            type === DayType.NEXT ? "text-muted" : "",
+            isToday(day, date.getMonth()) && type == DayType.CURRENT
               ? "bg-accent"
               : "",
           )}
         >
-          {number}
-        </div>
-      ))}
-      {range(1, rest).map((number) => (
-        <div
-          key={number}
-          className={cn("p-2 hover:bg-accent text-muted rounded-lg")}
-        >
-          {number}
+          {day}
         </div>
       ))}
     </div>
