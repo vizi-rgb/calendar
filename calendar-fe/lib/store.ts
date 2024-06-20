@@ -1,13 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import sidebarReducer from "./features/sidebar/sidebar-slice";
-import timelineReducer from "./features/timeline/timeline-slice";
 import authorizationReducer from "./features/authorization/authorization-slice";
+import calendarReducer from "./features/calendar/calendar-slice";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       sidebar: sidebarReducer,
-      timeline: timelineReducer,
+      calendar: calendarReducer,
       authorization: authorizationReducer,
     },
   });

@@ -34,10 +34,14 @@ function Hamburger(prop: { onClick?: () => void }) {
 }
 
 function CommandWrapper() {
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <Command>
-      <CommandInput placeholder="Type a command or search..." />
-    </Command>
+    <>
+      <Command className="rounded-lg border">
+        <CommandInput placeholder="Wyszukiwanie" />
+      </Command>
+    </>
   );
 }
 
@@ -69,6 +73,7 @@ export default function Topbar() {
           <AvatarWithName
             name={user?.name}
             surname={user?.surname}
+            email={user?.email}
             pictureUrl={user?.pictureUrl}
           />
         </div>
