@@ -22,6 +22,28 @@ const calendarSlice = createSlice({
       state.timeline = action.payload;
       localStorage.setItem("timeline", action.payload);
     },
+    previousDate(state) {
+      const newDate = new Date(state.date);
+
+      if (state.timeline === TimelineOption.Month) {
+        newDate.setMonth(newDate.getMonth() - 1);
+      } else if (state.timeline === TimelineOption.Year) {
+        newDate.setFullYear(newDate.getFullYear() - 1);
+      }
+
+      state.date = newDate;
+    },
+    nextDate(state) {
+      const newDate = new Date(state.date);
+
+      if (state.timeline === TimelineOption.Month) {
+        newDate.setMonth(newDate.getMonth() + 1);
+      } else if (state.timeline === TimelineOption.Year) {
+        newDate.setFullYear(newDate.getFullYear() + 1);
+      }
+
+      state.date = newDate;
+    },
     previousMonth(state) {
       const newDate = new Date(state.date);
       newDate.setMonth(newDate.getMonth() - 1);
@@ -37,5 +59,6 @@ const calendarSlice = createSlice({
   },
 });
 
-export const { setTimeline, previousMonth, nextMonth } = calendarSlice.actions;
+export const { setTimeline, previousMonth, nextMonth, previousDate, nextDate } =
+  calendarSlice.actions;
 export default calendarSlice.reducer;

@@ -11,12 +11,16 @@ import { format, setDefaultOptions } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { pl } from "date-fns/locale";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import {
-  nextMonth,
-  previousMonth,
-} from "@/lib/features/calendar/calendar-slice";
+import { nextDate, previousDate } from "@/lib/features/calendar/calendar-slice";
+import { TimelineOption } from "@/app/constants/timeline-option";
 
-function CalendarPopover({ inputDate }: { inputDate: Date }) {
+function CalendarPopover({
+  inputDate,
+  timeline,
+}: {
+  inputDate: Date;
+  timeline: TimelineOption;
+}) {
   const date = new Date(inputDate);
   setDefaultOptions({ locale: pl });
 
@@ -26,9 +30,15 @@ function CalendarPopover({ inputDate }: { inputDate: Date }) {
 
   let formatDate = () => {
     if (!date) return;
-    let formattedDate = format(date, "LLLL y");
-    formattedDate =
-      formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+
+    let formattedDate;
+    if (timeline !== TimelineOption.Year) {
+      formattedDate = format(date, "LLLL y");
+      formattedDate =
+        formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+    } else {
+      formattedDate = format(date, "y");
+    }
     return formattedDate;
   };
 
@@ -54,19 +64,20 @@ function CalendarPopover({ inputDate }: { inputDate: Date }) {
 
 export default function DatePicker() {
   const dispatch = useAppDispatch();
-  let selectedDate = useAppSelector((state) => state.calendar.date);
+  const selectedDate = useAppSelector((state) => state.calendar.date);
+  const selectedTimeline = useAppSelector((state) => state.calendar.timeline);
 
   return (
     <div className="flex flex-row items-center gap-x-0.5">
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => dispatch(previousMonth())}
+        onClick={() => dispatch(previousDate())}
       >
         <ChevronLeftIcon className="h-4 w-4" />
       </Button>
-      <CalendarPopover inputDate={selectedDate} />
-      <Button variant="ghost" size="icon" onClick={() => dispatch(nextMonth())}>
+      <CalendarPopover inputDate={selectedDate} timeline={selectedTimeline} />
+      <Button variant="ghost" size="icon" onClick={() => dispatch(nextDate())}>
         <ChevronRightIcon className="h-4 w-4" />
       </Button>
     </div>

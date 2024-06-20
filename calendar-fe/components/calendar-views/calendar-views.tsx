@@ -75,27 +75,45 @@ const calculateDayArray = (month: number, year: number) => {
 const YearView = ({ date }: { date: Date }) => {
   const month = date.getMonth();
   const day = date.getDate();
+  const year = date.getFullYear();
+  let key = 1;
+  console.log(date);
+
+  const currentDate = new Date();
+  const { currentMonth, currentDay, currentYear } = {
+    currentMonth: currentDate.getMonth(),
+    currentDay: currentDate.getDate(),
+    currentYear: currentDate.getFullYear(),
+  };
+
   return (
-    <div className="grid grid-cols-4 grid-rows-3 gap-20 h-full">
+    <div className="grid grid-cols-1 grid-rows-12 md:grid-cols-2 md:grid-rows-6 lg:grid-cols-4 lg:grid-rows-3 gap-x-20 gap-y-10 h-full">
       {range(0, 11).map((monthNo) => (
-        <div className="grid grid-cols-7 grid-rows-7">
+        <div className="grid grid-cols-7 auto-rows-fr" key={key++}>
           <p className="col-span-7 font-bold border-b mb-1">
             {months[monthNo]}
           </p>
           {range(0, 6).map((number) => (
-            <p className="text-center " key={number}>
+            <p className="text-center " key={key++}>
               {days[number].at(0)}
             </p>
           ))}
-          {range(1, 35).map((dayNo) => (
+          {calculateDayArray(monthNo, year).map(([_day, type]) => (
             <div
-              key={dayNo}
-              className={
-                "hover:font-bold cursor-pointer transition-colors duration-100 ease-in rounded-lg flex flex-row justify-center items-center" +
-                (dayNo === day && monthNo === month ? " bg-accent" : "")
-              }
+              key={key++}
+              className={cn(
+                "hover:font-bold cursor-pointer transition-all duration-200 ease-in-out rounded-lg flex flex-row justify-center items-center",
+                type === DayType.PREVIOUS ? "text-muted" : "",
+                type === DayType.NEXT ? "text-muted" : "",
+                _day === currentDay &&
+                  monthNo === currentMonth &&
+                  year === currentYear &&
+                  type === DayType.CURRENT
+                  ? " bg-accent"
+                  : "",
+              )}
             >
-              {dayNo}
+              {_day}
             </div>
           ))}
         </div>
@@ -145,17 +163,36 @@ const MonthView = ({ date }: { date: Date }) => {
 };
 
 const WeekView = () => {
-  return <div>Week View</div>;
+  return (
+    <div className="grid grid-cols-7 auto-rows-min">
+      {range(0, 6).map((number) => (
+        <p key={number} className="p-2 font-bold border-b mb-1">
+          {days[number]}
+        </p>
+      ))}
+    </div>
+  );
+};
+
+const WorkWeekView = () => {
+  return (
+    <div className="grid grid-cols-5 auto-rows-min">
+      {range(0, 4).map((number) => (
+        <p key={number} className="p-2 font-bold border-b mb-1">
+          {days[number]}
+        </p>
+      ))}
+    </div>
+  );
 };
 
 const DayView = () => {
   return (
-    <div className="grid grid-cols-[min-content_minmax(0,_1fr)] grid-rows-[24] gap-20">
-      {range(1, 24).map((number) => (
-        <div key={number}>{`${number}:00`}</div>
-      ))}
-      {range(1, 24).map((number) => (
-        <div key={number}>Event</div>
+    <div className="grid grid-cols-1 grid-rows-[24] gap-20">
+      {range(0, 0).map((number) => (
+        <p key={number} className="p-2 font-bold border-b mb-1">
+          {days[number]}
+        </p>
       ))}
     </div>
   );
@@ -170,6 +207,10 @@ export default function CalendarViews() {
       return <YearView date={date} />;
     case TimelineOption.Month:
       return <MonthView date={date} />;
+    case TimelineOption.Week:
+      return <WeekView />;
+    case TimelineOption.WorkWeek:
+      return <WorkWeekView />;
     case TimelineOption.Day:
       return <DayView />;
     default:
