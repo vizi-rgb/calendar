@@ -1,8 +1,15 @@
 "use client";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { TimelineOption } from "@/app/constants/timeline-option";
 import * as React from "react";
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
+import {
+  nextDate,
+  nextTimeline,
+  previousDate,
+  previousTimeline,
+} from "@/lib/features/calendar/calendar-slice";
 
 const days = [
   "Poniedziałek",
@@ -201,6 +208,30 @@ const DayView = () => {
 export default function CalendarViews() {
   let selectedView = useAppSelector((state) => state.calendar.timeline);
   let date = useAppSelector((state) => state.calendar.date);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case "ArrowRight":
+          dispatch(nextDate());
+          break;
+        case "ArrowLeft":
+          dispatch(previousDate());
+          break;
+        case "ArrowUp":
+          dispatch(nextTimeline());
+          break;
+        case "ArrowDown":
+          dispatch(previousTimeline());
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", down);
+
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   switch (selectedView) {
     case TimelineOption.Year:

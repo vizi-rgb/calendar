@@ -15,7 +15,7 @@ export default function TimelineSelect() {
   const enumEntries = Object.entries(TimelineOption);
 
   return (
-    <Tabs defaultValue={value ?? TimelineOption.Day} className="">
+    <Tabs value={value} defaultValue={value ?? TimelineOption.Day} className="">
       <TabsList className="grid w-full grid-cols-5">
         {enumEntries.map(([key, value]) => (
           <TabsTrigger
