@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.util.Date;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -20,6 +21,9 @@ public class CalendarEvent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Builder.Default
+    private UUID uuid = UUID.randomUUID();
 
     @Enumerated(EnumType.STRING)
     private Frequency frequency;

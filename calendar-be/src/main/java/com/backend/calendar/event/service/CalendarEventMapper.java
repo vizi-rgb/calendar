@@ -1,6 +1,7 @@
 package com.backend.calendar.event.service;
 
 import com.backend.calendar.event.domain.CalendarEvent;
+import com.backend.calendar.event.dto.CalendarEventResource;
 import com.backend.calendar.event.dto.CreateCalendarEventRequest;
 import com.backend.calendar.user.domain.User;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,18 @@ public class CalendarEventMapper {
             .title(request.title())
             .description(request.description())
             .user(user)
+            .build();
+    }
+
+    public CalendarEventResource mapCalendarEventToResource(CalendarEvent event) {
+        return CalendarEventResource.builder()
+            .id(event.getUuid())
+            .frequency(event.getFrequency())
+            .interval(event.getInterval())
+            .daysOfWeek(event.getDaysOfWeek())
+            .endDate(event.getEndDate())
+            .title(event.getTitle())
+            .description(event.getDescription())
             .build();
     }
 }
