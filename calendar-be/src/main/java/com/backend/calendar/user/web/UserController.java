@@ -37,8 +37,13 @@ public class UserController {
     }
 
     @PostMapping("/v1/authenticate")
-    public ResponseEntity<TokenContainer> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
+    public ResponseEntity<TokenContainer> authenticateUser(
+        HttpServletResponse response,
+        @RequestBody @Valid LoginRequest loginRequest
+    ) {
         final var registerResponse = userService.authenticateUser(loginRequest);
+        log.info("Setting cookie for user {}", loginRequest.email());
+        setCookie(response, registerResponse);
         return ResponseEntity.ok(new TokenContainer(registerResponse.token()));
     }
 
