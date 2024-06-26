@@ -12,7 +12,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { pl } from "date-fns/locale";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { nextDate, previousDate } from "@/lib/features/calendar/calendar-slice";
-import { TimelineOption } from "@/app/constants/timeline-option";
+import { TimelineOption } from "@/constants/timeline-option";
 
 function CalendarPopover({
   inputDate,

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { TimelineOption } from "@/app/constants/timeline-option";
+import { TimelineOption } from "@/constants/timeline-option";
 
 let initialTimeline: TimelineOption =
   (localStorage.getItem("timeline") as TimelineOption) ?? TimelineOption.Day;

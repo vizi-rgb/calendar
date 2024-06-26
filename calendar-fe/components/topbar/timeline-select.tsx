@@ -3,7 +3,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import * as React from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { setTimeline } from "@/lib/features/calendar/calendar-slice";
-import { TimelineOption } from "@/app/constants/timeline-option";
+import { TimelineOption } from "@/constants/timeline-option";
 
 export default function TimelineSelect() {
   const dispatch = useAppDispatch();

@@ -7,32 +7,44 @@ import { Button } from "@/components/ui/button";
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
 import userService from "@/services/user-service";
-import { LoginRequest } from "@/services/dto/login-request";
+import { LoginRequest } from "@/dto/login-request";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import GoogleSignInButton from "@/app/auth/google-signin-button";
+import { object, string } from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+const schema = object({
+  email: string()
+    .email("Nieprawidłowy format email")
+    .required("Email jest wymagany"),
+  password: string()
+    .min(6, "Hasło musi mieć co najmiej 6 znaków")
+    .max(60, "Hasło może mieć maksymalnie 60 znaków")
+    .required("Hasło jest wymagane"),
+});
 
 export default function SignInForm() {
-  const [error, setError] = useState(false);
+  const [authError, setAuthError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
   const [passwordShown, setPasswordShown] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   const router = useRouter();
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginRequest>({
+    resolver: yupResolver(schema),
+    reValidateMode: "onSubmit",
+  });
 
+  const onSubmit = (credentials: LoginRequest) => {
     setIsLoading(true);
-
-    const credentials: LoginRequest = {
-      email,
-      password,
-    };
 
     userService
       .login(credentials)
@@ -40,7 +52,7 @@ export default function SignInForm() {
         router.push("/calendar");
       })
       .catch((error) => {
-        setError(true);
+        setAuthError(true);
         setErrorMessage("Nieprawidłowy email lub hasło");
         console.log(error.response.data);
       })
@@ -57,14 +69,18 @@ export default function SignInForm() {
           Wpisz adres email oraz hasło, aby zalogować się do swojego konta.
         </p>
       </div>
-      <form onSubmit={(e) => handleSubmit(e)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-4">
-          {error && (
+          {(errors.email || errors.password || authError) && (
             <div className="py-6">
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Błąd</AlertTitle>
-                <AlertDescription>{errorMessage}</AlertDescription>
+                <AlertDescription>
+                  {errors.email?.message ||
+                    errors.password?.message ||
+                    errorMessage}
+                </AlertDescription>
               </Alert>
             </div>
           )}
@@ -72,22 +88,17 @@ export default function SignInForm() {
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
-              type="email"
               placeholder="rl9@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...register("email")}
               autoFocus={true}
-              required
             />
             <Label htmlFor="password">Hasło</Label>
             <div className="relative">
               <Input
                 id="password"
                 type={passwordShown ? "text" : "password"}
-                required
                 className="pr-8"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...register("password")}
               />
               <div
                 className="absolute right-0 top-0 px-2 py-2.5"

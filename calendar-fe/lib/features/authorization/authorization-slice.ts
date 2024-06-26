@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import User from "@/domain/User";
+import User from "@/dto/user";
 
 let initialUser = localStorage.getItem("user");
 let initialAccessToken = localStorage.getItem("accessToken");

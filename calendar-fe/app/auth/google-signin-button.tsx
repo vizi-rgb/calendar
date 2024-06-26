@@ -1,16 +1,16 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useGoogleLogin } from "@react-oauth/google";
-import GoogleIdTokenRequest, {
-  GoogleIdTokenResponse,
-} from "@/services/dto/google-oauth";
 import oauthService from "@/services/oauth-service";
 import { AxiosResponse } from "axios";
-import AuthResponse from "@/services/dto/auth-response";
 import userService from "@/services/user-service";
 import { useAppDispatch } from "@/lib/hooks";
 import { storeAuthorizedUser } from "@/lib/features/authorization/authorization-slice";
-import { useRouter } from "next/navigation";
+import {
+  AuthResponse,
+  GoogleIdTokenRequest,
+  GoogleIdTokenResponse,
+} from "@/dto/auth";
 
 const jwt = require("jsonwebtoken");
 
@@ -24,7 +24,6 @@ export default function GoogleSignInButton({
   callback: () => void;
 }) {
   const dispatch = useAppDispatch();
-  const router = useRouter();
 
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {

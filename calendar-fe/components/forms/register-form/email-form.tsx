@@ -1,5 +1,8 @@
-"use client";
+import { object, string } from "yup";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import userService from "@/services/user-service";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Loader2 } from "lucide-react";
@@ -7,51 +10,56 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import GoogleSignInButton from "@/app/auth/google-signin-button";
-import { useRouter } from "next/navigation";
+import { EmailVerificationRequest } from "@/dto/auth";
 
-export default function EmailForm({
-  onSuccess,
-}: {
-  onSuccess: (data: string) => void;
-}) {
-  const [email, setEmail] = useState("");
+const schema = object({
+  email: string()
+    .email("Nieprawidłowy format email")
+    .required("Email jest wymagany"),
+});
+
+const EmailForm = ({ onSuccess }: { onSuccess: (data: string) => void }) => {
   const [takenEmail, setTakenEmail] = useState("");
   const [isEmailTaken, setIsEmailTaken] = useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const onEmailChange = (e: any) => {
-    setEmail(e.target.value);
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{ email: string }>({
+    resolver: yupResolver(schema),
+    reValidateMode: "onSubmit",
+  });
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
+  const onSubmit = (credentials: EmailVerificationRequest) => {
     setIsLoading(true);
     userService
-      .checkIfEmailIsTaken(email)
+      .checkIfEmailIsTaken(credentials)
       .then((res) => {
-        onSuccess(email);
+        onSuccess(credentials.email);
       })
       .catch((err) => {
         setIsEmailTaken(true);
         setIsLoading(false);
-        setTakenEmail(email);
+        setTakenEmail(credentials.email);
       });
   };
 
   return (
     <>
-      <form onSubmit={(e) => handleSubmit(e)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-4">
           <div className="grid gap-2">
-            {isEmailTaken && (
+            {(errors.email || isEmailTaken) && (
               <div className="py-6">
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Błąd</AlertTitle>
                   <AlertDescription>
-                    Adres email {takenEmail} jest już zajęty
+                    {errors.email?.message ||
+                      `Adres email ${takenEmail} jest już zajęty`}
                   </AlertDescription>
                 </Alert>
               </div>
@@ -59,12 +67,9 @@ export default function EmailForm({
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
-              type="email"
               placeholder="rl9@example.com"
-              value={email}
-              onChange={(e) => onEmailChange(e)}
+              {...register("email")}
               autoFocus={true}
-              required
             />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
@@ -80,4 +85,6 @@ export default function EmailForm({
       </form>
     </>
   );
-}
+};
+
+export default EmailForm;

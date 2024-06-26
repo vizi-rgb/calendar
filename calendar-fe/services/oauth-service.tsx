@@ -1,8 +1,9 @@
 import axios, { AxiosResponse } from "axios";
-import GoogleIdTokenRequest, {
+import {
+  AuthResponse,
+  GoogleIdTokenRequest,
   GoogleIdTokenResponse,
-} from "@/services/dto/google-oauth";
-import AuthResponse from "@/services/dto/auth-response";
+} from "@/dto/auth";
 import endpoints from "@/endpoints";
 
 const oauthClient = axios.create({

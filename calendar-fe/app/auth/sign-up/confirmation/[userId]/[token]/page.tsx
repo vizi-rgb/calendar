@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import userService from "@/services/user-service";
-import UserResource from "@/services/dto/user-resource";
+import User from "@/dto/user";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -11,7 +11,7 @@ export default function EmailVerificationConfirmation({
 }: {
   params: { userId: string; token: string };
 }) {
-  const [user, setUser] = useState<UserResource | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 

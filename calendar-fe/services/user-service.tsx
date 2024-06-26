@@ -1,8 +1,12 @@
 import axios from "axios";
 import endpoints from "../endpoints";
-import UserResource from "@/services/dto/user-resource";
-import AuthResponse from "@/services/dto/auth-response";
-import { LoginRequest } from "@/services/dto/login-request";
+import User from "@/dto/user";
+
+import {
+  AuthResponse,
+  EmailVerificationRequest,
+  LoginRequest,
+} from "@/dto/auth";
 
 const userApiClient = axios.create({
   baseURL: endpoints.USER_URL,
@@ -12,16 +16,16 @@ const userApiClient = axios.create({
 });
 
 const UserService = {
-  checkIfEmailIsTaken: (email: string) =>
-    userApiClient.get(`/v1/email/${email}`),
+  checkIfEmailIsTaken: (credentials: EmailVerificationRequest) =>
+    userApiClient.get(`/v1/email/${credentials.email}`),
 
-  register: (user: UserResource) =>
+  register: (user: User) =>
     userApiClient.post<AuthResponse>("/v1/register", user),
 
   login: (credentials: LoginRequest) =>
     userApiClient.post<AuthResponse>("/v1/authenticate", credentials),
 
-  getUser: (userId: string) => userApiClient.get<UserResource>(`/v1/${userId}`),
+  getUser: (userId: string) => userApiClient.get<User>(`/v1/${userId}`),
 
   verifyEmail: (userId: string, token: string) =>
     userApiClient.post(`/v1/${userId}/verify/${token}`),

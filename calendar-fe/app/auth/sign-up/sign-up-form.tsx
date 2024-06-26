@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import EmailForm from "@/app/auth/sign-up/email-form";
-import FullForm from "@/app/auth/sign-up/full-form";
+import FullForm from "@/components/forms/register-form/full-form";
+import EmailForm from "@/components/forms/register-form/email-form";
 
 export default function SignUpForm() {
   const [isEmailAvailable, setIsEmailAvailable] = useState(false);

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import userService from "@/services/user-service";
-import UserResource from "@/services/dto/user-resource";
+import User from "@/dto/user";
 import { Button } from "@/components/ui/button";
 
 export default function SignUpConfirmation({
@@ -9,7 +9,7 @@ export default function SignUpConfirmation({
 }: {
   params: { userId: string };
 }) {
-  const [user, setUser] = useState<UserResource | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     userService.getUser(params.userId).then((res) => setUser(res.data));

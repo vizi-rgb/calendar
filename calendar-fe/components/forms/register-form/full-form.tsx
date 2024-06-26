@@ -1,4 +1,4 @@
-"use client";
+import { object, ref, string } from "yup";
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import userService from "@/services/user-service";
@@ -8,80 +8,84 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { RegisterRequest } from "@/dto/auth";
 
-const validate = (
-  name: string,
-  surname: string,
-  password: string,
-): string | null => {
-  if (name.length < 2 || name.length > 50) {
-    return "Imię musi mieć od 2 do 50 znaków";
-  }
+interface RegisterFormInputs {
+  email: string;
+  name: string;
+  surname: string;
+  password: string;
+  passwordConfirmation: string;
+}
 
-  if (surname.length < 2 || surname.length > 50) {
-    return "Nazwisko musi mieć od 2 do 50 znaków";
-  }
-
-  if (password.length < 6) {
-    return "Hasło musi mieć co najmniej 6 znaków";
-  }
-
-  if (password.length > 60) {
-    return "Hasło nie może mieć więcej niż 60 znaków";
-  }
-
-  return null;
+const mapRegisterFormInputsToRegisterRequest = (
+  inputs: RegisterFormInputs,
+): RegisterRequest => {
+  return {
+    email: inputs.email,
+    name: inputs.name,
+    surname: inputs.surname,
+    password: inputs.password,
+  };
 };
 
-export default function FullForm({
+const schema = object({
+  email: string()
+    .required("Email jest wymagany")
+    .email("Nieprawidłowy format email"),
+  name: string()
+    .required("Imię jest wymagane")
+    .min(2, "Imię musi mieć co najmniej 2 znaki")
+    .max(50, "Imię nie może mieć więcej niż 50 znaków"),
+  surname: string()
+    .required("Nazwisko jest wymagane")
+    .min(2, "Nazwisko musi mieć co najmniej 2 znaki")
+    .max(50, "Nazwisko nie może mieć więcej niż 50 znaków"),
+  password: string()
+    .required("Hasło jest wymagane")
+    .min(6, "Hasło musi mieć co najmniej 6 znaków")
+    .max(60, "Hasło nie może mieć więcej niż 60 znaków"),
+  passwordConfirmation: string()
+    .required("Potwierdzenie hasła jest wymagane")
+    .oneOf(
+      [ref("password"), "Hasło i potwierdzenie hasła nie są takie same"],
+      "Hasła nie są takie same",
+    ),
+});
+
+const FullForm = ({
   email,
   onCancel,
 }: {
   email: string;
   onCancel: () => void;
-}) {
+}) => {
   const [passwordShown, setPasswordShown] = useState(false);
   const [passwordConfirmationShown, setPasswordConfirmationShown] =
     useState(false);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
   const [isLoading, setIsLoading] = useState(false);
-
-  const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
-  const [password, setPassword] = useState("");
 
   const router = useRouter();
   const path = usePathname();
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormInputs>({
+    resolver: yupResolver(schema),
+    reValidateMode: "onSubmit",
+  });
+
+  const onSubmit = (credentials: RegisterFormInputs) => {
     setIsLoading(true);
 
-    if (password != e.target.passwordConfirmation.value) {
-      setError(true);
-      setErrorMessage("Hasła nie są takie same");
-      setIsLoading(false);
-      return;
-    }
-
-    const error = validate(name, surname, password);
-
-    if (error) {
-      setError(true);
-      setErrorMessage(error);
-      setIsLoading(false);
-      return;
-    }
-
     userService
-      .register({
-        email: email,
-        name: name,
-        surname: surname,
-        password: password,
-      })
+      .register(mapRegisterFormInputsToRegisterRequest(credentials))
       .then((res) => {
         const tokenPayload = atob(res.data.token.split(".")[1]);
         const userId = JSON.parse(tokenPayload).userId;
@@ -96,48 +100,51 @@ export default function FullForm({
       });
   };
 
+  const anyError =
+    errors.email ||
+    errors.name ||
+    errors.surname ||
+    errors.password ||
+    errors.passwordConfirmation ||
+    error;
+  const firstErrorMessage =
+    errors.email?.message ||
+    errors.name?.message ||
+    errors.surname?.message ||
+    errors.password?.message ||
+    errors.passwordConfirmation?.message ||
+    errorMessage;
+
   return (
     <>
-      <form onSubmit={(e) => handleSubmit(e)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-4">
           <div className="grid gap-2">
-            {error && (
+            {anyError && (
               <div className="py-6">
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Błąd</AlertTitle>
-                  <AlertDescription>{errorMessage}</AlertDescription>
+                  <AlertDescription>{firstErrorMessage}</AlertDescription>
                 </Alert>
               </div>
             )}
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
-              type="email"
               placeholder="rl9@example.com"
-              value={email}
+              {...register("email", { value: email })}
               disabled={true}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="first-name">Imię</Label>
-              <Input
-                id="first-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoFocus={true}
-                required
-              />
+              <Input id="first-name" {...register("name")} autoFocus={true} />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="last-name">Nazwisko</Label>
-              <Input
-                id="last-name"
-                value={surname}
-                onChange={(e) => setSurname(e.target.value)}
-                required
-              />
+              <Input id="last-name" {...register("surname")} />
             </div>
           </div>
           <div className="grid gap-2">
@@ -146,10 +153,8 @@ export default function FullForm({
               <Input
                 id="password"
                 type={passwordShown ? "text" : "password"}
-                required
                 className="pr-8"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...register("password")}
               />
               <div
                 className="absolute right-0 top-0 px-2 py-2.5"
@@ -165,7 +170,7 @@ export default function FullForm({
               <Input
                 id="passwordConfirmation"
                 type={passwordConfirmationShown ? "text" : "password"}
-                required
+                {...register("passwordConfirmation")}
                 className="pr-8"
               />
               <div
@@ -198,4 +203,6 @@ export default function FullForm({
       </form>
     </>
   );
-}
+};
+
+export default FullForm;

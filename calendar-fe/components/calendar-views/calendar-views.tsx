@@ -1,6 +1,6 @@
 "use client";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { TimelineOption } from "@/app/constants/timeline-option";
+import { TimelineOption } from "@/constants/timeline-option";
 import * as React from "react";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
