@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button";
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
 import userService from "@/services/user-service";
-import { LoginRequest } from "@/dto/login-request";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import GoogleSignInButton from "@/app/auth/google-signin-button";
+import GoogleButton from "@/components/button/google-button";
 import { object, string } from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { LoginRequest } from "@/dto/auth";
 
 const schema = object({
   email: string()
@@ -26,7 +26,7 @@ const schema = object({
     .required("Hasło jest wymagane"),
 });
 
-export default function SignInForm() {
+export default function LoginForm() {
   const [authError, setAuthError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -112,7 +112,7 @@ export default function SignInForm() {
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             <p className="px-2">Zaloguj się</p>
           </Button>
-          <GoogleSignInButton
+          <GoogleButton
             isLoading={isLoading}
             setIsLoading={setIsLoading}
             callback={() => router.push("/calendar")}

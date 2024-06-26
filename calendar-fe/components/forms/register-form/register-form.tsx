@@ -4,7 +4,7 @@ import Link from "next/link";
 import FullForm from "@/components/forms/register-form/full-form";
 import EmailForm from "@/components/forms/register-form/email-form";
 
-export default function SignUpForm() {
+export default function RegisterForm() {
   const [isEmailAvailable, setIsEmailAvailable] = useState(false);
   const [email, setEmail] = useState("");
 

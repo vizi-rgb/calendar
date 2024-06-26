@@ -1,10 +1,10 @@
 import { Metadata } from "next";
-import SignInForm from "@/app/auth/sign-in/sign-in-form";
+import LoginForm from "@/components/forms/login-form/login-form";
 
 export const metadata: Metadata = {
   title: "Zaloguj się",
 };
 
 export default function SignIn() {
-  return <SignInForm />;
+  return <LoginForm />;
 }

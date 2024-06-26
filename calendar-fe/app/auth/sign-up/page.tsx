@@ -1,11 +1,11 @@
 import { Metadata } from "next";
 import React from "react";
-import SignUpForm from "@/app/auth/sign-up/sign-up-form";
+import RegisterForm from "@/components/forms/register-form/register-form";
 
 export const metadata: Metadata = {
   title: "Zarejestruj się",
 };
 
 export default function SignUp() {
-  return <SignUpForm />;
+  return <RegisterForm />;
 }

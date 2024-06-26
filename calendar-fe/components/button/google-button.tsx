@@ -14,7 +14,7 @@ import {
 
 const jwt = require("jsonwebtoken");
 
-export default function GoogleSignInButton({
+export default function GoogleButton({
   isLoading,
   setIsLoading,
   callback,

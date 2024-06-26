@@ -9,7 +9,7 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import GoogleSignInButton from "@/app/auth/google-signin-button";
+import GoogleButton from "@/components/button/google-button";
 import { EmailVerificationRequest } from "@/dto/auth";
 
 const schema = object({
@@ -76,7 +76,7 @@ const EmailForm = ({ onSuccess }: { onSuccess: (data: string) => void }) => {
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             <p className="px-2">Dalej</p>
           </Button>
-          <GoogleSignInButton
+          <GoogleButton
             isLoading={isLoading}
             setIsLoading={setIsLoading}
             callback={() => router.push("/calendar")}

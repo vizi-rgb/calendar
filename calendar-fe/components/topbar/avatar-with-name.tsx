@@ -27,6 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { buttonVariants } from "@/components/ui/button";
 
 const LogoutAlert = ({
   open,
@@ -50,7 +51,12 @@ const LogoutAlert = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Anuluj</AlertDialogCancel>
-          <AlertDialogAction onClick={onLogout}>Kontynuuj</AlertDialogAction>
+          <AlertDialogAction
+            className={buttonVariants({ variant: "destructive" })}
+            onClick={onLogout}
+          >
+            Kontynuuj
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

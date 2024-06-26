@@ -10,47 +10,17 @@ import {
   previousDate,
   previousTimeline,
 } from "@/lib/features/calendar/calendar-slice";
+import { days, DayType, months } from "@/constants/calendar-view-contants";
 
-const days = [
-  "Poniedziałek",
-  "Wtorek",
-  "Środa",
-  "Czwartek",
-  "Piątek",
-  "Sobota",
-  "Niedziela",
-];
-
-const months = [
-  "Styczeń",
-  "Luty",
-  "Marzec",
-  "Kwiecień",
-  "Maj",
-  "Czerwiec",
-  "Lipiec",
-  "Sierpień",
-  "Wrzesień",
-  "Październik",
-  "Listopad",
-  "Grudzień",
-];
-
-const enum DayType {
-  PREVIOUS,
-  CURRENT,
-  NEXT,
-}
-
-const daysInMonth = (month: number, year: number) => {
+const daysInMonth = (month: number, year: number): number => {
   return new Date(year, month + 1, 0).getDate();
 };
 
-const range = (start: number, end: number) => {
+const range = (start: number, end: number): number[] => {
   return Array.from({ length: end - start + 1 }, (_, i) => i + start);
 };
 
-const calculateDayArray = (month: number, year: number) => {
+const calculateDayArray = (month: number, year: number): number[][] => {
   const daysInCurrentMonth = daysInMonth(month, year);
   const daysInPreviousMonth = daysInMonth(month - 1, year);
 
