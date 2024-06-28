@@ -3,7 +3,7 @@ import { ModeToggle } from "@/components/topbar/mode-toggle";
 import Settings from "@/components/topbar/settings";
 import Notifications from "@/components/topbar/notifications";
 import Tasks from "@/components/topbar/tasks";
-import CreateButton from "@/components/topbar/create-button";
+import CreateEventButton from "@/components/topbar/create-event-button";
 import { Button } from "@/components/ui/button";
 import * as React from "react";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
@@ -68,7 +68,7 @@ export default function Topbar() {
           <CommandWrapper />
         </div>
         <div className="flex flex-row items-center justify-self-end gap-x-10">
-          <CreateButton />
+          <CreateEventButton />
           <IconButtons />
           <AvatarWithName
             name={user?.name}

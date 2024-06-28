@@ -6,6 +6,7 @@ import {
   AuthResponse,
   EmailVerificationRequest,
   LoginRequest,
+  RegisterRequest,
 } from "@/dto/auth";
 
 const userApiClient = axios.create({
@@ -19,7 +20,7 @@ const UserService = {
   checkIfEmailIsTaken: (credentials: EmailVerificationRequest) =>
     userApiClient.get(`/v1/email/${credentials.email}`),
 
-  register: (user: User) =>
+  register: (user: RegisterRequest) =>
     userApiClient.post<AuthResponse>("/v1/register", user),
 
   login: (credentials: LoginRequest) =>
