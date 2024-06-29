@@ -5,13 +5,18 @@ import com.backend.calendar.event.domain.Frequency;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Builder
 public record CreateCalendarEventRequest(
     @NotNull
     Frequency frequency,
+
+    @NotNull
+    LocalDateTime startDateTime,
+
+    LocalDateTime endDateTime,
 
     @NotNull
     @PositiveOrZero
@@ -21,7 +26,6 @@ public record CreateCalendarEventRequest(
     @NotEmpty
     Set<Day> daysOfWeek,
 
-    Date endDate,
 
     @NotBlank
     @Size(min = 1, max = 100)

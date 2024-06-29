@@ -1,5 +1,6 @@
 package com.backend.calendar.task.dto;
 
+import com.backend.calendar.util.NullOrNotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -15,6 +16,7 @@ public record UpdateCalendarTaskRequest(
 
     Boolean isDone,
 
+    @NullOrNotBlank
     @Size(min = 1, max = 100)
     String title,
 

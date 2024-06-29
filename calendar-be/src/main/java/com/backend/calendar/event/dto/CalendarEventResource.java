@@ -4,7 +4,7 @@ import com.backend.calendar.event.domain.Day;
 import com.backend.calendar.event.domain.Frequency;
 import lombok.Builder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,7 +14,8 @@ public record CalendarEventResource(
     Frequency frequency,
     Integer interval,
     Set<Day> daysOfWeek,
-    Date endDate,
+    LocalDateTime startDateTime,
+    LocalDateTime endDateTime,
     String title,
     String description
 ) {

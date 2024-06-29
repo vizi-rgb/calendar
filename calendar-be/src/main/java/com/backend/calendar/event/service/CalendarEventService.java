@@ -81,8 +81,11 @@ public class CalendarEventService {
         if (request.daysOfWeek() != null) {
             event.setDaysOfWeek(request.daysOfWeek());
         }
-        if (request.endDate() != null) {
-            event.setEndDate(request.endDate());
+        if (request.startDateTime() != null) {
+            event.setStartDateTime(request.startDateTime());
+        }
+        if (request.endDateTime() != null) {
+            event.setEndDateTime(request.endDateTime());
         }
         if (request.title() != null) {
             event.setTitle(request.title());
