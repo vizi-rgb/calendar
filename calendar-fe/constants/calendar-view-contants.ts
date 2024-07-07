@@ -8,6 +8,16 @@ export const days: string[] = [
   "Niedziela",
 ];
 
+export const daysEN: string[] = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
 export const months: string[] = [
   "Styczeń",
   "Luty",

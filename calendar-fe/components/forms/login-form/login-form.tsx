@@ -15,6 +15,9 @@ import { object, string } from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LoginRequest } from "@/dto/auth";
+import { useAppDispatch } from "@/lib/hooks";
+import { storeAuthorizedUser } from "@/lib/features/authorization/authorization-slice";
+import { AxiosError } from "axios";
 
 const schema = object({
   email: string()
@@ -33,6 +36,7 @@ export default function LoginForm() {
   const [passwordShown, setPasswordShown] = useState(false);
 
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const {
     register,
@@ -43,22 +47,25 @@ export default function LoginForm() {
     reValidateMode: "onSubmit",
   });
 
+  const onSuccess = (data: any) => {
+    dispatch(storeAuthorizedUser(data));
+    router.push("/calendar");
+  };
+
+  const onError = (error: AxiosError) => {
+    setAuthError(true);
+    setErrorMessage("Nieprawidłowy email lub hasło");
+  };
+
   const onSubmit = (credentials: LoginRequest) => {
     setIsLoading(true);
 
-    userService
-      .login(credentials)
-      .then((response) => {
-        router.push("/calendar");
-      })
-      .catch((error) => {
-        setAuthError(true);
-        setErrorMessage("Nieprawidłowy email lub hasło");
-        console.log(error.response.data);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    userService.login({
+      credentials: credentials,
+      onSuccess: onSuccess,
+      onError: onError,
+      doFinally: () => setIsLoading(false),
+    });
   };
 
   return (

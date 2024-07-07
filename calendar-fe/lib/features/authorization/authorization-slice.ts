@@ -1,10 +1,10 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import User from "@/dto/user";
 
 let initialUser = localStorage.getItem("user");
 let initialAccessToken = localStorage.getItem("accessToken");
 
-interface AuthorizationState {
+export interface AuthorizationState {
   user: User | null;
   accessToken: string | null;
 }
@@ -18,7 +18,8 @@ const authorizationSlice = createSlice({
   name: "authorization",
   initialState,
   reducers: {
-    storeAuthorizedUser(state, action) {
+    storeAuthorizedUser(state, action: PayloadAction<AuthorizationState>) {
+      if (!action.payload.user || !action.payload.accessToken) return;
       state.user = action.payload.user;
       state.accessToken = action.payload.accessToken;
       localStorage.setItem("accessToken", action.payload.accessToken);

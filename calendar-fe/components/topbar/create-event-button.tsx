@@ -10,48 +10,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "@radix-ui/react-icons";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-const DatePickField = () => {
-  const [date, setDate] = useState<Date>();
-
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant={"outline"}
-          className={cn(
-            "justify-start text-left font-normal",
-            !date && "text-muted-foreground",
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Wybierz datę</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-          initialFocus
-        />
-      </PopoverContent>
-    </Popover>
-  );
-};
+import { AddEventForm } from "@/components/forms/event-form/event-form";
 
 const EventSheet = ({
   open,
@@ -81,36 +41,10 @@ const EventSheet = ({
             <TabsTrigger value="task">Zadanie</TabsTrigger>
           </TabsList>
           <TabsContent value="event">
-            <form>
-              <div className="grid gap-4 pt-5">
-                <div className="grid gap-2">
-                  <Label htmlFor="title">Tytuł</Label>
-                  <Input id="title" autoFocus={true} />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor={"date"}>Data wydarzenia</Label>
-                  <DatePickField />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="description">Opis</Label>
-                  <Textarea id="description" />
-                </div>
-              </div>
-            </form>
+            <AddEventForm />
           </TabsContent>
           <TabsContent value="task">
-            <form>
-              <div className="grid gap-4 pt-5">
-                <div className="grid gap-2">
-                  <Label htmlFor="title">Tytuł</Label>
-                  <Input id="title" autoFocus={true} />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor={"date"}>Data zadania</Label>
-                  <DatePickField />
-                </div>
-              </div>
-            </form>
+            <p>Not implemented</p>
           </TabsContent>
         </Tabs>
 

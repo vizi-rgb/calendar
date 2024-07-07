@@ -26,7 +26,6 @@ public record CreateCalendarEventRequest(
     @NotEmpty
     Set<Day> daysOfWeek,
 
-
     @NotBlank
     @Size(min = 1, max = 100)
     String title,

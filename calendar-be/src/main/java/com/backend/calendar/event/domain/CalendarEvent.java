@@ -39,7 +39,6 @@ public class CalendarEvent {
     @Enumerated(EnumType.STRING)
     private Set<Day> daysOfWeek;
 
-
     @NotNull
     private String title;
 

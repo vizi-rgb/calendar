@@ -24,8 +24,6 @@ function CalendarPopover({
   const date = new Date(inputDate);
   setDefaultOptions({ locale: pl });
 
-  console.log({ inputDate });
-
   const doSomething = () => {};
 
   let formatDate = () => {
