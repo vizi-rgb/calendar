@@ -2,57 +2,19 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "@radix-ui/react-icons";
-import { Calendar } from "@/components/ui/calendar";
 import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { days, daysEN } from "@/constants/calendar-view-contants";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { array, date, mixed, number, object, string } from "yup";
 import { Frequency } from "@/constants/event-constants";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { If, Then } from "react-if";
-import { format } from "date-fns";
-
-const schema = object({
-  title: string()
-    .required("Tytuł jest wymagany")
-    .test(
-      "is-not-empty",
-      "Tytuł nie może być pusty",
-      (value) => value?.trim().length > 0,
-    )
-    .max(100, "Maksymalnie 100 znaków"),
-
-  startDateTime: date().required("Data rozpoczęcia jest wymagana"),
-
-  frequency: mixed<Frequency>()
-    .required("Częstotliwość jest wymagana")
-    .default(Frequency.ONETIME),
-
-  interval: number().required("Interwał jest wymagany").default(1),
-
-  daysOfWeek: array()
-    .of(string().oneOf(daysEN))
-    .min(1, "Wybierz co najmniej jeden dzień"),
-
-  description: string().max(500, "Maksymalnie 500 znaków"),
-});
+import { EventFormSchema } from "@/components/forms/event-form/event-form.schema";
+import EventDatePicker from "@/components/forms/event-form/event-date-picker";
+import EventFrequencySelect, {
+  SelectOption,
+} from "@/components/forms/event-form/event-frequency-select";
 
 const ErrorMessageText = ({ message }: { message?: string }) => {
   return <small className="text-destructive">{message}</small>;
@@ -60,17 +22,52 @@ const ErrorMessageText = ({ message }: { message?: string }) => {
 
 export const AddEventForm = () => {
   const [isRepetitive, setIsRepetitive] = useState<boolean>(false);
-  const [frequency, setFrequency] = useState<string>("");
+  const [frequency, setFrequency] = useState<string>(Frequency.DAILY);
+
+  const selectOptions: SelectOption[] = [
+    { value: Frequency.DAILY, label: "Codziennie" },
+    { value: Frequency.WEEKLY, label: "Co tydzień" },
+    { value: Frequency.MONTHLY, label: "Co miesiąc" },
+    { value: Frequency.YEARLY, label: "Co rok" },
+    { value: Frequency.CUSTOM, label: "Niestandardowe" },
+  ];
+
+  const selectOptionsForCustomFrequency: SelectOption[] = [
+    { value: Frequency.DAILY, label: "dzień" },
+    { value: Frequency.WEEKLY, label: "tydzień" },
+    { value: Frequency.MONTHLY, label: "miesiąc" },
+    { value: Frequency.YEARLY, label: "rok" },
+  ];
 
   const {
     control,
     handleSubmit,
     register,
+    setValue,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(EventFormSchema),
     reValidateMode: "onSubmit",
+    defaultValues: {
+      frequency: Frequency.ONETIME,
+      interval: 1,
+    },
   });
+
+  const handleSetRepetitive = (isRepetitive: boolean): void => {
+    const frequency: Frequency = isRepetitive
+      ? Frequency.DAILY
+      : Frequency.ONETIME;
+    setIsRepetitive(isRepetitive);
+    setValue("frequency", frequency);
+  };
+
+  const handleEventFrequencySelect = (frequency: string): void => {
+    setFrequency(frequency);
+    if (frequency === Frequency.CUSTOM) {
+      setValue("frequency", Frequency.DAILY);
+    }
+  };
 
   const onSubmit = (data: any) => {
     console.log(data);
@@ -91,29 +88,11 @@ export const AddEventForm = () => {
             control={control}
             name="startDateTime"
             render={({ field: { onChange, onBlur, value } }) => (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "justify-start text-left font-normal",
-                      !date && "text-muted-foreground",
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {value ? format(value, "PPP") : <span>Wybierz datę</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={value}
-                    onSelect={onChange}
-                    onDayBlur={onBlur}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <EventDatePicker
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+              />
             )}
           />
           {errors.startDateTime && (
@@ -124,7 +103,7 @@ export const AddEventForm = () => {
           <Switch
             id="is-repetitive"
             checked={isRepetitive}
-            onCheckedChange={setIsRepetitive}
+            onCheckedChange={handleSetRepetitive}
           />
           <Label htmlFor="is-repetitive">Powtarza się?</Label>
         </div>
@@ -134,38 +113,18 @@ export const AddEventForm = () => {
               <Controller
                 name="frequency"
                 control={control}
-                render={({ field }) => (
-                  <Select
-                    onValueChange={(value: string) => {
-                      field.onChange(
-                        value === "custom" ? Frequency.DAILY : value,
-                      );
-                      setFrequency(value);
+                render={({ field: { onChange } }) => (
+                  <EventFrequencySelect
+                    onChange={(frequency: string) => {
+                      onChange(frequency);
+                      handleEventFrequencySelect(frequency);
                     }}
-                    value={field.value}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Wybierz" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={Frequency.DAILY.toString()}>
-                        Codziennie
-                      </SelectItem>
-                      <SelectItem value={Frequency.WEEKLY.toString()}>
-                        Co tydzień
-                      </SelectItem>
-                      <SelectItem value={Frequency.MONTHLY.toString()}>
-                        Co miesiąc
-                      </SelectItem>
-                      <SelectItem value={Frequency.YEARLY.toString()}>
-                        Co rok
-                      </SelectItem>
-                      <SelectItem value="custom">Niestandardowe</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    value={frequency}
+                    selectOptions={selectOptions}
+                  />
                 )}
               />
-              <If condition={frequency === "custom"}>
+              <If condition={frequency === Frequency.CUSTOM}>
                 <Then>
                   <div className="py-4">
                     <Card>
@@ -176,19 +135,19 @@ export const AddEventForm = () => {
                             <Controller
                               name={"daysOfWeek"}
                               control={control}
-                              render={({ field }) => (
+                              render={({ field: { onChange } }) => (
                                 <ToggleGroup
                                   variant="outline"
                                   type="multiple"
                                   className="justify-start"
-                                  onValueChange={field.onChange}
+                                  onValueChange={onChange}
                                 >
-                                  {days.map((day, index) => (
+                                  {days.map((day: string, index: number) => (
                                     <ToggleGroupItem
                                       key={day}
                                       value={daysEN[index]}
                                     >
-                                      {day.at(0)}
+                                      {day[0]}
                                     </ToggleGroupItem>
                                   ))}
                                 </ToggleGroup>
@@ -205,38 +164,14 @@ export const AddEventForm = () => {
                             <Controller
                               name={"frequency"}
                               control={control}
-                              render={({ field }) => (
-                                <Select
-                                  defaultValue={field.value}
-                                  value={field.value}
-                                  onValueChange={field.onChange}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem
-                                      value={Frequency.DAILY.toString()}
-                                    >
-                                      dzień
-                                    </SelectItem>
-                                    <SelectItem
-                                      value={Frequency.WEEKLY.toString()}
-                                    >
-                                      tydzień
-                                    </SelectItem>
-                                    <SelectItem
-                                      value={Frequency.MONTHLY.toString()}
-                                    >
-                                      miesiąc
-                                    </SelectItem>
-                                    <SelectItem
-                                      value={Frequency.YEARLY.toString()}
-                                    >
-                                      rok
-                                    </SelectItem>
-                                  </SelectContent>
-                                </Select>
+                              render={({ field: { onChange, value } }) => (
+                                <EventFrequencySelect
+                                  onChange={onChange}
+                                  value={value}
+                                  selectOptions={
+                                    selectOptionsForCustomFrequency
+                                  }
+                                />
                               )}
                             />
                           </div>
