@@ -17,11 +17,13 @@ const jwt = require("jsonwebtoken");
 export default function GoogleButton({
   isLoading,
   setIsLoading,
-  callback,
+  onSuccess,
+  onError,
 }: {
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
-  callback: () => void;
+  onSuccess: () => void;
+  onError: () => void;
 }) {
   const dispatch = useAppDispatch();
 
@@ -54,16 +56,17 @@ export default function GoogleButton({
         })
         .then((authorizedUser) => {
           dispatch(storeAuthorizedUser(authorizedUser));
-          callback();
+          onSuccess();
         })
         .catch((error) => {
           setIsLoading(false);
+          onError();
           console.error("Error during authentication process:", error);
         });
     },
     onError: (error) => {
       setIsLoading(false);
-      console.error(error);
+      console.error("onError");
     },
     flow: "auth-code",
   });

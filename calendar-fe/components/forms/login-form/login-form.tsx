@@ -57,6 +57,11 @@ export default function LoginForm() {
     setErrorMessage("Nieprawidłowy email lub hasło");
   };
 
+  const onGoogleAuthError = () => {
+    setAuthError(true);
+    setErrorMessage("Nie udało się zalogować przez Google");
+  };
+
   const onSubmit = (credentials: LoginRequest) => {
     setIsLoading(true);
 
@@ -122,7 +127,8 @@ export default function LoginForm() {
           <GoogleButton
             isLoading={isLoading}
             setIsLoading={setIsLoading}
-            callback={() => router.push("/calendar")}
+            onSuccess={() => router.push("/calendar")}
+            onError={onGoogleAuthError}
           />
         </div>
       </form>

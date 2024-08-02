@@ -52,7 +52,9 @@ const EventSheet = ({
           <SheetClose className={buttonVariants({ variant: "outline" })}>
             Anuluj
           </SheetClose>
-          <Button variant="default">Dodaj</Button>
+          <Button variant="default" form="create-event-form" type="submit">
+            Dodaj
+          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>

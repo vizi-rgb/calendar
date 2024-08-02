@@ -20,8 +20,9 @@ const schema = object({
 
 const EmailForm = ({ onSuccess }: { onSuccess: (data: string) => void }) => {
   const [takenEmail, setTakenEmail] = useState("");
-  const [isEmailTaken, setIsEmailTaken] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
 
   const {
@@ -41,10 +42,16 @@ const EmailForm = ({ onSuccess }: { onSuccess: (data: string) => void }) => {
         onSuccess(credentials.email);
       })
       .catch((err) => {
-        setIsEmailTaken(true);
-        setIsLoading(false);
         setTakenEmail(credentials.email);
+        setAuthError(true);
+        setErrorMessage(`Email ${takenEmail} jest już zajęty`);
+        setIsLoading(false);
       });
+  };
+
+  const onGoogleAuthError = () => {
+    setAuthError(true);
+    setErrorMessage("Nie udało się zalogować przez Google");
   };
 
   return (
@@ -52,14 +59,13 @@ const EmailForm = ({ onSuccess }: { onSuccess: (data: string) => void }) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-4">
           <div className="grid gap-2">
-            {(errors.email || isEmailTaken) && (
+            {(errors.email || authError) && (
               <div className="py-6">
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Błąd</AlertTitle>
                   <AlertDescription>
-                    {errors.email?.message ||
-                      `Adres email ${takenEmail} jest już zajęty`}
+                    {errors.email?.message || errorMessage}
                   </AlertDescription>
                 </Alert>
               </div>
@@ -79,7 +85,8 @@ const EmailForm = ({ onSuccess }: { onSuccess: (data: string) => void }) => {
           <GoogleButton
             isLoading={isLoading}
             setIsLoading={setIsLoading}
-            callback={() => router.push("/calendar")}
+            onSuccess={() => router.push("/calendar")}
+            onError={onGoogleAuthError}
           />
         </div>
       </form>
