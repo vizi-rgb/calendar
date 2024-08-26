@@ -177,7 +177,8 @@ const DayView = () => {
 
 export default function CalendarViews() {
   let selectedView = useAppSelector((state) => state.calendar.timeline);
-  let date = useAppSelector((state) => state.calendar.date);
+  const dateString: string = useAppSelector((state) => state.calendar.date);
+  const date: Date = new Date(dateString);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
