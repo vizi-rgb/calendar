@@ -2,7 +2,7 @@
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { TimelineOption } from "@/constants/timeline-option";
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import {
   nextDate,
@@ -11,6 +11,16 @@ import {
   previousTimeline,
 } from "@/lib/features/calendar/calendar-slice";
 import { days, DayType, months } from "@/constants/calendar-view-contants";
+import {
+  Calendar as BigCalendar,
+  DateLocalizer,
+  momentLocalizer,
+  View,
+  Views,
+} from "react-big-calendar";
+import "./custom-calendar.css";
+import "moment/locale/pl";
+import moment from "moment";
 
 const daysInMonth = (month: number, year: number): number => {
   return new Date(year, month + 1, 0).getDate();
@@ -218,4 +228,57 @@ export default function CalendarViews() {
     default:
       return <WeekView />;
   }
+}
+
+export function MyBigCalendarViews() {
+  moment.locale("pl");
+  const localizer = momentLocalizer(moment);
+
+  const { formats } = useMemo(
+    () => ({
+      formats: {
+        weekdayFormat: (
+          date: Date,
+          culture: string,
+          localizer: DateLocalizer,
+        ) => localizer.format(date, "dddd", culture),
+      },
+    }),
+    [],
+  );
+
+  const selectedView = useAppSelector((state) => state.calendar.timeline);
+  const selectedDate = useAppSelector((state) => state.calendar.date);
+
+  let bigCalendarView: View = Views.WEEK;
+  switch (selectedView) {
+    case TimelineOption.Month:
+      bigCalendarView = Views.MONTH;
+      break;
+    case TimelineOption.Week:
+      bigCalendarView = Views.WEEK;
+      break;
+    case TimelineOption.Day:
+      bigCalendarView = Views.DAY;
+      break;
+  }
+
+  return (
+    <BigCalendar
+      localizer={localizer}
+      events={[
+        {
+          title: "Test",
+          start: new Date(),
+          end: new Date(),
+        },
+      ]}
+      startAccessor="start"
+      toolbar={false}
+      formats={formats}
+      date={selectedDate}
+      view={bigCalendarView}
+      endAccessor="end"
+    />
+  );
 }

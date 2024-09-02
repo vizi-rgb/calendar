@@ -1,5 +1,5 @@
-import CalendarViews from "@/components/calendar-views/calendar-views";
 import { Metadata } from "next";
+import { MyBigCalendarViews } from "@/components/calendar-views/calendar-views";
 
 export const metadata: Metadata = {
   title: "Kalendarz",
@@ -8,7 +8,8 @@ export const metadata: Metadata = {
 export default function Calendar() {
   return (
     <main className="grow">
-      <CalendarViews />
+      {/*<CalendarViews />*/}
+      <MyBigCalendarViews />
     </main>
   );
 }
