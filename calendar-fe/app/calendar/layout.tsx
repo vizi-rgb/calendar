@@ -9,7 +9,7 @@ export default function CalendarLayout({
       <div className="grow-0 shrink-0">
         <Topbar />
       </div>
-      <div className="flex flex-row py-2 gap-x-2 flex-auto">
+      <div className="flex flex-row py-2 gap-x-2 flex-auto overflow-hidden">
         <SideBar />
         {children}
       </div>

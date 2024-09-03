@@ -234,15 +234,14 @@ export function MyBigCalendarViews() {
   moment.locale("pl");
   const localizer = momentLocalizer(moment);
 
-  const { formats } = useMemo(
+  const formats = useMemo(
     () => ({
-      formats: {
-        weekdayFormat: (
-          date: Date,
-          culture: string,
-          localizer: DateLocalizer,
-        ) => localizer.format(date, "dddd", culture),
-      },
+      weekdayFormat: (date: Date, culture: string, localizer: DateLocalizer) =>
+        localizer.format(date, "dddd", culture),
+      dateFormat: (date: Date, culture: string, localizer: DateLocalizer) =>
+        localizer.format(date, "D", culture),
+      dayFormat: (date: Date, culture: string, localizer: DateLocalizer) =>
+        localizer.format(date, "dddd D", culture),
     }),
     [],
   );
@@ -258,26 +257,41 @@ export function MyBigCalendarViews() {
     case TimelineOption.Week:
       bigCalendarView = Views.WEEK;
       break;
+    case TimelineOption.WorkWeek:
+      bigCalendarView = Views.WORK_WEEK;
+      break;
     case TimelineOption.Day:
       bigCalendarView = Views.DAY;
       break;
   }
 
+  const today = new Date();
+  today.setHours(10, 30);
+  const next = new Date();
+  next.setHours(12, 30);
+  const events = [
+    {
+      title: "Test",
+      start: today,
+      end: next,
+    },
+    {
+      title: "Siema",
+      start: new Date(2024, 8, 4),
+      end: new Date(2024, 8, 4),
+    },
+  ];
+
   return (
     <BigCalendar
       localizer={localizer}
-      events={[
-        {
-          title: "Test",
-          start: new Date(),
-          end: new Date(),
-        },
-      ]}
+      events={events}
       startAccessor="start"
       toolbar={false}
       formats={formats}
       date={selectedDate}
       view={bigCalendarView}
+      views={[Views.MONTH, Views.WEEK, Views.WORK_WEEK, Views.DAY]}
       endAccessor="end"
     />
   );

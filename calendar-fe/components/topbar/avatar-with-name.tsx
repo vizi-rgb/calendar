@@ -87,7 +87,7 @@ function DropdownForAvatar({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar className="size-10">
-            <AvatarImage src={pictureUrl} />
+            <AvatarImage src={pictureUrl} alt="Profile picture" />
             <AvatarFallback>{name?.at(0) + "" + surname?.at(0)}</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
