@@ -373,7 +373,6 @@ button.rbc-input::-moz-focus-inner {
     -ms-user-select: none;
     user-select: none;
     -webkit-user-select: none;
-    gap: 1px;
     height: 100%;
 }
 
@@ -449,7 +448,7 @@ button.rbc-input::-moz-focus-inner {
 }
 
 .rbc-day-bg:hover {
-    background-color: hsl(var(--primary-foreground));
+    background-color: hsl(var(--accent));
 }
 
 .rbc-day-bg + .rbc-day-bg {
@@ -707,7 +706,7 @@ button.rbc-input::-moz-focus-inner {
 
 .rbc-month-row > .rbc-row-bg > .rbc-today {
     border-radius: var(--radius);
-    background-color: hsl(var(--accent));
+    border: 1px solid hsl(var(--border));
 }
 
 .rbc-time-header-cell > .rbc-today {

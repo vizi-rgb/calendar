@@ -293,6 +293,7 @@ export function MyBigCalendarViews() {
       view={bigCalendarView}
       views={[Views.MONTH, Views.WEEK, Views.WORK_WEEK, Views.DAY]}
       endAccessor="end"
+      scrollToTime={new Date()}
     />
   );
 }
