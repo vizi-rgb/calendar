@@ -55,49 +55,59 @@ const calendarSlice = createSlice({
       }
     },
     previousDate(state) {
-      const newDate = new Date(state.date);
+      const newDate: Date = new Date(state.date);
 
-      if (state.timeline === TimelineOption.Month) {
-        newDate.setMonth(newDate.getMonth() - 1);
-      } else if (state.timeline === TimelineOption.Year) {
-        newDate.setFullYear(newDate.getFullYear() - 1);
+      switch (state.timeline) {
+        case TimelineOption.Year:
+          newDate.setFullYear(newDate.getFullYear() - 1);
+          break;
+        case TimelineOption.Month:
+          newDate.setMonth(newDate.getMonth() - 1);
+          break;
+        case TimelineOption.Week:
+        case TimelineOption.WorkWeek:
+          newDate.setDate(newDate.getDate() - 7);
+          break;
+        case TimelineOption.Day:
+          newDate.setDate(newDate.getDate() - 1);
+          break;
       }
 
       state.date = newDate.toISOString();
     },
     nextDate(state) {
-      const newDate = new Date(state.date);
+      const newDate: Date = new Date(state.date);
 
-      if (state.timeline === TimelineOption.Month) {
-        newDate.setMonth(newDate.getMonth() + 1);
-      } else if (state.timeline === TimelineOption.Year) {
-        newDate.setFullYear(newDate.getFullYear() + 1);
+      switch (state.timeline) {
+        case TimelineOption.Year:
+          newDate.setFullYear(newDate.getFullYear() + 1);
+          break;
+        case TimelineOption.Month:
+          newDate.setMonth(newDate.getMonth() + 1);
+          break;
+        case TimelineOption.Week:
+        case TimelineOption.WorkWeek:
+          newDate.setDate(newDate.getDate() + 7);
+          break;
+        case TimelineOption.Day:
+          newDate.setDate(newDate.getDate() + 1);
+          break;
       }
 
       state.date = newDate.toISOString();
     },
-    previousMonth(state) {
-      const newDate = new Date(state.date);
-      newDate.setMonth(newDate.getMonth() - 1);
-
-      state.date = newDate.toISOString();
-    },
-    nextMonth(state) {
-      const newDate = new Date(state.date);
-      newDate.setMonth(newDate.getMonth() + 1);
-
-      state.date = newDate.toISOString();
+    setDate(state, action: PayloadAction<string>) {
+      state.date = action.payload;
     },
   },
 });
 
 export const {
   setTimeline,
-  previousMonth,
-  nextMonth,
-  previousDate,
-  nextDate,
   previousTimeline,
   nextTimeline,
+  previousDate,
+  nextDate,
+  setDate,
 } = calendarSlice.actions;
 export default calendarSlice.reducer;

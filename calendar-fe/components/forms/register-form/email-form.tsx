@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import GoogleButton from "@/components/button/google-button";
 import { EmailVerificationRequest } from "@/dto/auth";
+import { ROUTES } from "@/constants/route-contants";
 
 const schema = object({
   email: string()
@@ -85,7 +86,7 @@ const EmailForm = ({ onSuccess }: { onSuccess: (data: string) => void }) => {
           <GoogleButton
             isLoading={isLoading}
             setIsLoading={setIsLoading}
-            onSuccess={() => router.push("/calendar")}
+            onSuccess={() => router.push(ROUTES.CALENDAR)}
             onError={onGoogleAuthError}
           />
         </div>

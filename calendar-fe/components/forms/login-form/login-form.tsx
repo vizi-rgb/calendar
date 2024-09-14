@@ -18,6 +18,7 @@ import { LoginRequest } from "@/dto/auth";
 import { useAppDispatch } from "@/lib/hooks";
 import { storeAuthorizedUser } from "@/lib/features/authorization/authorization-slice";
 import { AxiosError } from "axios";
+import { ROUTES } from "@/constants/route-contants";
 
 const schema = object({
   email: string()
@@ -49,7 +50,7 @@ export default function LoginForm() {
 
   const onSuccess = (data: any) => {
     dispatch(storeAuthorizedUser(data));
-    router.push("/calendar");
+    router.push(ROUTES.CALENDAR);
   };
 
   const onError = (error: AxiosError) => {
@@ -127,7 +128,7 @@ export default function LoginForm() {
           <GoogleButton
             isLoading={isLoading}
             setIsLoading={setIsLoading}
-            onSuccess={() => router.push("/calendar")}
+            onSuccess={() => router.push(ROUTES.CALENDAR)}
             onError={onGoogleAuthError}
           />
         </div>

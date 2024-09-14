@@ -5,6 +5,7 @@ import User from "@/dto/user";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { ROUTES } from "@/constants/route-contants";
 
 export default function EmailVerificationConfirmation({
   params,
@@ -51,7 +52,7 @@ export default function EmailVerificationConfirmation({
               <hr />
               <Button
                 variant={"outline"}
-                onClick={() => router.push("/auth/sign-in")}
+                onClick={() => router.push(ROUTES.LOGIN)}
               >
                 Przejdź do logowania
               </Button>

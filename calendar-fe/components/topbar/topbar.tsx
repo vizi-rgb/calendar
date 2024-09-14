@@ -13,6 +13,8 @@ import DatePicker from "@/components/topbar/date-picker";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { toggleSidebar } from "@/lib/features/sidebar/sidebar-slice";
 import TimelineSelect from "@/components/topbar/timeline-select";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/constants/route-contants";
 
 function IconButtons() {
   return (
@@ -45,9 +47,14 @@ function CommandWrapper() {
   );
 }
 
-export default function Topbar() {
+export default function Topbar({
+  isCalendarView = true,
+}: {
+  isCalendarView: boolean | undefined;
+}) {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.authorization.user);
+  const router = useRouter();
 
   const handleHamburgerClick = () => {
     dispatch(toggleSidebar());
@@ -59,16 +66,25 @@ export default function Topbar() {
         <div className="flex flex-row items-center gap-x-10 justify-self-start">
           <div className="flex flex-row gap-x-2 items-center">
             <Hamburger onClick={handleHamburgerClick} />
-            <h3>Kalendarz</h3>
+            <h3
+              className="hover:underline"
+              onClick={() => router.push(ROUTES.CALENDAR)}
+            >
+              Kalendarz
+            </h3>
           </div>
-          <DatePicker />
-          <TimelineSelect />
+          {isCalendarView && (
+            <>
+              <DatePicker />
+              <TimelineSelect />
+            </>
+          )}
         </div>
         <div className="justify-self-center w-[400px]">
           <CommandWrapper />
         </div>
         <div className="flex flex-row items-center justify-self-end gap-x-10">
-          <CreateEventButton />
+          {isCalendarView && <CreateEventButton />}
           <IconButtons />
           <AvatarWithName
             name={user?.name}

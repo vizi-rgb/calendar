@@ -28,6 +28,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
+import { ROUTES } from "@/constants/route-contants";
 
 const LogoutAlert = ({
   open,
@@ -78,7 +79,7 @@ function DropdownForAvatar({
   const dispatch = useAppDispatch();
   const router = useRouter();
   const handleLogout = () => {
-    router.push("/auth/sign-in");
+    router.push(ROUTES.LOGIN);
     dispatch(clearAuthorizedUser());
   };
 
@@ -95,7 +96,7 @@ function DropdownForAvatar({
           <DropdownMenuLabel>Moje konto</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push(ROUTES.PROFILE)}>
               Profil
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </DropdownMenuItem>

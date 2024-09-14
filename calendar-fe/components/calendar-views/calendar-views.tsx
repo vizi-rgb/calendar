@@ -22,6 +22,27 @@ import "./custom-calendar.css";
 import "moment/locale/pl";
 import moment from "moment";
 
+type DateFormatFn = (
+  date: Date,
+  culture: string,
+  localizer: DateLocalizer,
+) => string;
+
+const timelineOptionToBigCalendarView = (option: TimelineOption): View => {
+  switch (option) {
+    case TimelineOption.Day:
+      return Views.DAY;
+    case TimelineOption.Week:
+      return Views.WEEK;
+    case TimelineOption.WorkWeek:
+      return Views.WORK_WEEK;
+    case TimelineOption.Month:
+      return Views.MONTH;
+    default:
+      return Views.WEEK;
+  }
+};
+
 const daysInMonth = (month: number, year: number): number => {
   return new Date(year, month + 1, 0).getDate();
 };
@@ -230,40 +251,43 @@ export default function CalendarViews() {
   }
 }
 
+export function MyBigCalendarViewsWrapper() {
+  const selectedView: TimelineOption = useAppSelector(
+    (state) => state.calendar.timeline,
+  );
+
+  const selectedDate: Date = new Date(
+    useAppSelector((state) => state.calendar.date),
+  );
+
+  if (selectedView === TimelineOption.Year) {
+    return <YearView date={selectedDate} />;
+  }
+
+  return <MyBigCalendarViews />;
+}
+
 export function MyBigCalendarViews() {
   moment.locale("pl");
   const localizer = momentLocalizer(moment);
 
   const formats = useMemo(
-    () => ({
-      weekdayFormat: (date: Date, culture: string, localizer: DateLocalizer) =>
-        localizer.format(date, "dddd", culture),
-      dateFormat: (date: Date, culture: string, localizer: DateLocalizer) =>
-        localizer.format(date, "D", culture),
-      dayFormat: (date: Date, culture: string, localizer: DateLocalizer) =>
-        localizer.format(date, "dddd D", culture),
-    }),
+    () =>
+      ({
+        weekdayFormat: (date, culture, localizer) =>
+          localizer.format(date, "dddd", culture),
+        dateFormat: (date, culture, localizer) =>
+          localizer.format(date, "D", culture),
+        dayFormat: (date, culture, localizer) =>
+          localizer.format(date, "dddd D", culture),
+      }) as { [key: string]: DateFormatFn },
     [],
   );
 
   const selectedView = useAppSelector((state) => state.calendar.timeline);
   const selectedDate = useAppSelector((state) => state.calendar.date);
 
-  let bigCalendarView: View = Views.WEEK;
-  switch (selectedView) {
-    case TimelineOption.Month:
-      bigCalendarView = Views.MONTH;
-      break;
-    case TimelineOption.Week:
-      bigCalendarView = Views.WEEK;
-      break;
-    case TimelineOption.WorkWeek:
-      bigCalendarView = Views.WORK_WEEK;
-      break;
-    case TimelineOption.Day:
-      bigCalendarView = Views.DAY;
-      break;
-  }
+  let bigCalendarView: View = timelineOptionToBigCalendarView(selectedView);
 
   const today = new Date();
   today.setHours(10, 30);
