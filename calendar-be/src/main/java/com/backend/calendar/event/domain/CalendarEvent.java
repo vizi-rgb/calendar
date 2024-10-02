@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -37,7 +38,7 @@ public class CalendarEvent {
 
     @ElementCollection
     @Enumerated(EnumType.STRING)
-    private Set<Day> daysOfWeek;
+    private Set<DayOfWeek> daysOfWeek;
 
     @NotNull
     private String title;

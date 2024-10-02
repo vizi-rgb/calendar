@@ -24,10 +24,9 @@ public class CalendarTask {
     @Builder.Default
     private UUID uuid = UUID.randomUUID();
 
-    @NotNull
-    private LocalDateTime dateTime;
+    private LocalDateTime startDateTime;
 
-    private Long estimatedTimeInMinutes;
+    private LocalDateTime endDateTime;
 
     @Builder.Default
     private boolean isDone = false;

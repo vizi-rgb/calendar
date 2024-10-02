@@ -21,8 +21,11 @@ public class CalendarEventController {
 
     private final CalendarEventService calendarEventService;
 
-    @PostMapping
-    public ResponseEntity<Void> createEvent(Principal principal, @RequestBody @Valid CreateCalendarEventRequest request) {
+    @PostMapping()
+    public ResponseEntity<Void> createEvent(
+        Principal principal,
+        @RequestBody @Valid CreateCalendarEventRequest request
+    ) {
         calendarEventService.createEvent(request, principal.getName());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

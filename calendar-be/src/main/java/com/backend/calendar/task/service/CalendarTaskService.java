@@ -30,7 +30,8 @@ public class CalendarTaskService {
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         final var task = calendarTaskMapper
-            .mapCreateCalendarTaskToCalendarTask(request, user);
+            .mapCreateCalendarTaskToCalendarTask(request);
+        task.setUser(user);
 
         log.info("Creating task: {} for user {}", task.getTitle(), user.getEmail());
         calendarTaskRepository.save(task);
@@ -73,11 +74,11 @@ public class CalendarTaskService {
 
     private void doPartialUpdates(CalendarTask task, UpdateCalendarTaskRequest request) {
         if (request.dateTime() != null) {
-            task.setDateTime(request.dateTime());
+//            task.setDateTime(request.dateTime());
         }
 
         if (request.estimatedTimeInMinutes() != null) {
-            task.setEstimatedTimeInMinutes(request.estimatedTimeInMinutes());
+//            task.setEstimatedTimeInMinutes(request.estimatedTimeInMinutes());
         }
 
         if (request.isDone() != null) {

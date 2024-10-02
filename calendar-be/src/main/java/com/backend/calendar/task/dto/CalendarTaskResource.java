@@ -8,8 +8,8 @@ import java.util.UUID;
 @Builder
 public record CalendarTaskResource(
     UUID id,
-    LocalDateTime dateTime,
-    Long estimatedTimeInMinutes,
+    LocalDateTime startDateTime,
+    LocalDateTime endDateTime,
     Boolean isDone,
     String title,
     String description

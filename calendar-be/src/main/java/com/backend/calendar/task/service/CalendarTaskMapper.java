@@ -3,35 +3,29 @@ package com.backend.calendar.task.service;
 import com.backend.calendar.task.domain.CalendarTask;
 import com.backend.calendar.task.dto.CalendarTaskResource;
 import com.backend.calendar.task.dto.CreateCalendarTaskRequest;
-import com.backend.calendar.user.domain.User;
-import org.springframework.stereotype.Component;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
-@Component
-public class CalendarTaskMapper {
+@Mapper(componentModel = "spring")
+public interface CalendarTaskMapper {
 
-    public CalendarTask mapCreateCalendarTaskToCalendarTask(
-        CreateCalendarTaskRequest request,
-        User user
-    ) {
-        final var minutes = request.estimatedTimeInMinutes() != null ?
-            request.estimatedTimeInMinutes() : 0L;
-        return CalendarTask.builder()
-            .dateTime(request.dateTime())
-            .estimatedTimeInMinutes(minutes)
-            .title(request.title())
-            .description(request.description())
-            .user(user)
-            .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "isDone", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    CalendarTask mapCreateCalendarTaskToCalendarTask(CreateCalendarTaskRequest request);
 
-    public CalendarTaskResource mapCalendarTaskToResource(CalendarTask task) {
-        return CalendarTaskResource.builder()
-            .id(task.getUuid())
-            .dateTime(task.getDateTime())
-            .estimatedTimeInMinutes(task.getEstimatedTimeInMinutes())
-            .isDone(task.isDone())
-            .title(task.getTitle())
-            .description(task.getDescription())
-            .build();
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "isDone", ignore = true)
+    CalendarTaskResource mapCalendarTaskToResource(CalendarTask task);
+
+    @AfterMapping
+    default void checkIfIsWithoutSpecificDate(CreateCalendarTaskRequest request, @MappingTarget CalendarTask task) {
+        if (request.isWithoutSpecificDate()) {
+            task.setStartDateTime(null);
+            task.setEndDateTime(null);
+        }
     }
 }

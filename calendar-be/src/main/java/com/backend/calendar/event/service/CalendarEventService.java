@@ -5,6 +5,7 @@ import com.backend.calendar.event.dto.CalendarEventResource;
 import com.backend.calendar.event.dto.CreateCalendarEventRequest;
 import com.backend.calendar.event.dto.UpdateCalendarEventRequest;
 import com.backend.calendar.event.repository.CalendarEventRepository;
+import com.backend.calendar.event.util.CalendarEventParser;
 import com.backend.calendar.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ public class CalendarEventService {
 
     private final CalendarEventRepository calendarEventRepository;
     private final CalendarEventMapper calendarEventMapper;
+    private final CalendarEventParser calendarEventParser;
     private final UserRepository userRepository;
 
     @Transactional
@@ -29,11 +31,17 @@ public class CalendarEventService {
         final var user = userRepository.findUserByEmail(userEmail)
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        final var event = calendarEventMapper
-            .mapCreateCalenderEventRequestToCalendarEvent(request, user);
+        log.info(request.toString());
+        final var eventInfo = calendarEventParser
+            .parseCreateCalendarEventRequest(request);
 
-        log.info("Creating event: {} for user {}", event.getTitle(), user.getEmail());
-        calendarEventRepository.save(event);
+        final var calendarEvent = calendarEventMapper
+            .mapCalendarEventInfoToCalendar(eventInfo);
+
+        calendarEvent.setUser(user);
+
+        log.info("Creating event: {} for user {}", calendarEvent.getTitle(), user.getEmail());
+        calendarEventRepository.save(calendarEvent);
     }
 
     @Transactional(readOnly = true)

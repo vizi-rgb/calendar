@@ -2,39 +2,15 @@ package com.backend.calendar.event.service;
 
 import com.backend.calendar.event.domain.CalendarEvent;
 import com.backend.calendar.event.dto.CalendarEventResource;
-import com.backend.calendar.event.dto.CreateCalendarEventRequest;
-import com.backend.calendar.user.domain.User;
-import org.springframework.stereotype.Component;
+import com.backend.calendar.event.util.CalendarEventInfo;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class CalendarEventMapper {
 
-    public CalendarEvent mapCreateCalenderEventRequestToCalendarEvent(
-        CreateCalendarEventRequest request,
-        User user
-    ) {
-        return CalendarEvent.builder()
-            .frequency(request.frequency())
-            .interval(request.interval())
-            .daysOfWeek(request.daysOfWeek())
-            .startDateTime(request.startDateTime())
-            .endDateTime(request.endDateTime())
-            .title(request.title())
-            .description(request.description())
-            .user(user)
-            .build();
-    }
+@Mapper(componentModel = "spring")
+interface CalendarEventMapper {
+    CalendarEvent mapCalendarEventInfoToCalendar(CalendarEventInfo info);
 
-    public CalendarEventResource mapCalendarEventToResource(CalendarEvent event) {
-        return CalendarEventResource.builder()
-            .id(event.getUuid())
-            .frequency(event.getFrequency())
-            .interval(event.getInterval())
-            .daysOfWeek(event.getDaysOfWeek())
-            .startDateTime(event.getStartDateTime())
-            .endDateTime(event.getEndDateTime())
-            .title(event.getTitle())
-            .description(event.getDescription())
-            .build();
-    }
+    @Mapping(target = "id", source = "uuid")
+    CalendarEventResource mapCalendarEventToResource(CalendarEvent event);
 }

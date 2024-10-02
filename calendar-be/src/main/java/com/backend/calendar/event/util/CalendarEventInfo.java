@@ -1,18 +1,20 @@
-package com.backend.calendar.event.dto;
+package com.backend.calendar.event.util;
 
 import com.backend.calendar.event.domain.Frequency;
 import lombok.Builder;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
-public record CreateCalendarEventRequest(
+public record CalendarEventInfo(
     String title,
     LocalDateTime startDateTime,
     LocalDateTime endDateTime,
-    Boolean isRepetitive,
     Frequency frequency,
-    String description,
-    CustomEventFrequency customFrequency
+    Integer interval,
+    List<DayOfWeek> daysOfWeek,
+    String description
 ) {
 }
