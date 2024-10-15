@@ -17,11 +17,7 @@ import {
   setDate,
 } from "@/lib/features/calendar/calendar-slice";
 import { TimelineOption } from "@/constants/timeline-option";
-
-function customMonthCaptionFormatter(date: Date): string {
-  const formattedCaption = format(date, "LLLL y", { locale: pl });
-  return formattedCaption.charAt(0).toUpperCase() + formattedCaption.slice(1);
-}
+import { customMonthCaptionFormatter } from "@/util/calendar-utils";
 
 function getMonday(date: Date): Date {
   let localDate: Date = new Date(date);

@@ -12,6 +12,9 @@ import {
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddEventForm } from "@/components/forms/event-form/event-form";
+import AddTaskForm from "@/components/forms/task-form/task-form";
+
+type Plannable = "event" | "task";
 
 const EventSheet = ({
   open,
@@ -20,10 +23,10 @@ const EventSheet = ({
   open: boolean;
   onOpenChange: (value: boolean) => void;
 }) => {
-  const [type, setType] = useState<"event" | "task">("event");
+  const [type, setType] = useState<Plannable>("event");
 
   const handleTypeChange = (e: string) => {
-    setType(e as "event" | "task");
+    setType(e as Plannable);
   };
 
   return (
@@ -41,10 +44,13 @@ const EventSheet = ({
             <TabsTrigger value="task">Zadanie</TabsTrigger>
           </TabsList>
           <TabsContent value="event">
-            <AddEventForm />
+            <AddEventForm
+              onSubmitClicked={() => setIsLoading(true)}
+              onComplete={() => setIsLoading(false)}
+            />
           </TabsContent>
           <TabsContent value="task">
-            <p>Not implemented</p>
+            <AddTaskForm />
           </TabsContent>
         </Tabs>
 

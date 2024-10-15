@@ -1,4 +1,4 @@
-import { array, date, mixed, number, object, string } from "yup";
+import { array, boolean, date, mixed, number, object, string } from "yup";
 import { Frequency } from "@/constants/event-constants";
 import { daysEN } from "@/constants/calendar-view-contants";
 
@@ -14,13 +14,28 @@ export const EventFormSchema = object({
 
   startDateTime: date().required("Data rozpoczęcia jest wymagana"),
 
+  endDateTime: date().required("Data zakończenia jest wymagana"),
+
+  isRepetitive: boolean().required("Czy powtarzalne jest wymagane"),
+
   frequency: mixed<Frequency>().required("Częstotliwość jest wymagana"),
 
-  interval: number().required("Interwał jest wymagany"),
-
-  daysOfWeek: array()
-    .of(string().oneOf(daysEN))
-    .min(1, "Wybierz co najmniej jeden dzień"),
-
   description: string().max(500, "Maksymalnie 500 znaków"),
+
+  customFrequency: object({
+    interval: number(),
+    frequency: mixed<Frequency>(),
+    daysOfWeek: array().of(string().oneOf(daysEN)),
+  }).when("frequency", {
+    is: Frequency.CUSTOM,
+    then: () =>
+      object({
+        interval: number().required("Interwał jest wymagany").min(1),
+        frequency: mixed<Frequency>().required("Częstotliwość jest wymagana"),
+        daysOfWeek: array()
+          .of(string().oneOf(daysEN))
+          .min(1, "Wybierz przynajmniej jeden dzień"),
+      }),
+    otherwise: () => object().notRequired(),
+  }),
 });

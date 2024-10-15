@@ -10,11 +10,14 @@ import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { useState } from "react";
+import { pl } from "date-fns/locale";
+import { customMonthCaptionFormatter } from "@/util/calendar-utils";
 
 interface PropType {
   onChange: (value: Date | undefined) => void;
   onBlur: () => void;
   value: Date;
+  disabled?: boolean;
 }
 
 const EventDatePicker = (field: PropType) => {
@@ -33,9 +36,10 @@ const EventDatePicker = (field: PropType) => {
     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
       <PopoverTrigger asChild>
         <Button
+          disabled={field.disabled}
           variant={"outline"}
           className={cn(
-            "justify-start text-left font-normal",
+            "justify-start text-left font-normal w-full",
             !field.value && "text-muted-foreground",
           )}
         >
@@ -45,6 +49,10 @@ const EventDatePicker = (field: PropType) => {
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
+          locale={pl}
+          formatters={{
+            formatCaption: customMonthCaptionFormatter,
+          }}
           mode="single"
           selected={field.value}
           onSelect={handleSelect}
