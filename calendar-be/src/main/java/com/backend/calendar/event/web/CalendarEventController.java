@@ -1,7 +1,7 @@
 package com.backend.calendar.event.web;
 
-import com.backend.calendar.event.dto.CalendarEventResource;
 import com.backend.calendar.event.dto.CreateCalendarEventRequest;
+import com.backend.calendar.event.dto.SimpleCalendarEventResource;
 import com.backend.calendar.event.dto.UpdateCalendarEventRequest;
 import com.backend.calendar.event.service.CalendarEventService;
 import jakarta.validation.Valid;
@@ -31,7 +31,7 @@ public class CalendarEventController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CalendarEventResource>> getUserEvents(Principal principal) {
+    public ResponseEntity<List<SimpleCalendarEventResource>> getUserEvents(Principal principal) {
         return ResponseEntity.ok(calendarEventService.getUserEvents(principal.getName()));
     }
 

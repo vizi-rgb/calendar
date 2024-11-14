@@ -15,7 +15,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class CalendarTask {
+public class CalendarTask implements Task {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

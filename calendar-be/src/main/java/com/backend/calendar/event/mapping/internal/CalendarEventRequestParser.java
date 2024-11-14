@@ -1,17 +1,23 @@
-package com.backend.calendar.event.util;
+package com.backend.calendar.event.mapping.internal;
 
 import com.backend.calendar.event.domain.Frequency;
 import com.backend.calendar.event.dto.CreateCalendarEventRequest;
 import org.springframework.stereotype.Component;
 
-@Component
-public class CalendarEventParser {
+import java.time.DayOfWeek;
+import java.util.Collections;
+import java.util.List;
 
+@Component
+class CalendarEventRequestParser implements CalendarEventRequestParsing {
+
+    @Override
     public CalendarEventInfo parseCreateCalendarEventRequest(
         CreateCalendarEventRequest request
     ) {
         final var frequency = getFrequency(request);
         final var interval = getInterval(request);
+        final var daysOfWeek = getDaysOfWeek(request);
 
         return CalendarEventInfo.builder()
             .title(request.title())
@@ -19,7 +25,7 @@ public class CalendarEventParser {
             .endDateTime(request.endDateTime())
             .frequency(frequency)
             .interval(interval)
-            .daysOfWeek(request.customFrequency().daysOfWeek())
+            .daysOfWeek(daysOfWeek)
             .description(request.description())
             .build();
     }
@@ -44,6 +50,18 @@ public class CalendarEventParser {
         }
 
         return request.customFrequency().interval();
+    }
+
+    private List<DayOfWeek> getDaysOfWeek(CreateCalendarEventRequest request) {
+        if (!request.isRepetitive() || request.frequency() != Frequency.CUSTOM) {
+            return Collections.emptyList();
+        }
+
+        if (request.customFrequency() == null) {
+            throw new IllegalStateException("Custom frequency cannot be null");
+        }
+
+        return request.customFrequency().daysOfWeek();
     }
 
 }

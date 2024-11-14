@@ -17,7 +17,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class CalendarEvent {
+public class CalendarEvent implements Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

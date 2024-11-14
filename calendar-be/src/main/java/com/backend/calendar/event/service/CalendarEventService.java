@@ -1,11 +1,11 @@
 package com.backend.calendar.event.service;
 
 import com.backend.calendar.event.domain.CalendarEvent;
-import com.backend.calendar.event.dto.CalendarEventResource;
 import com.backend.calendar.event.dto.CreateCalendarEventRequest;
+import com.backend.calendar.event.dto.SimpleCalendarEventResource;
 import com.backend.calendar.event.dto.UpdateCalendarEventRequest;
+import com.backend.calendar.event.mapping.CalendarEventMappingUseCases;
 import com.backend.calendar.event.repository.CalendarEventRepository;
-import com.backend.calendar.event.util.CalendarEventParser;
 import com.backend.calendar.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +22,7 @@ import java.util.stream.Collectors;
 public class CalendarEventService {
 
     private final CalendarEventRepository calendarEventRepository;
-    private final CalendarEventMapper calendarEventMapper;
-    private final CalendarEventParser calendarEventParser;
+    private final CalendarEventMappingUseCases calendarEventMappingUseCases;
     private final UserRepository userRepository;
 
     @Transactional
@@ -32,11 +31,7 @@ public class CalendarEventService {
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         log.info(request.toString());
-        final var eventInfo = calendarEventParser
-            .parseCreateCalendarEventRequest(request);
-
-        final var calendarEvent = calendarEventMapper
-            .mapCalendarEventInfoToCalendar(eventInfo);
+        final var calendarEvent = calendarEventMappingUseCases.toCalendarEvent(request);
 
         calendarEvent.setUser(user);
 
@@ -45,11 +40,11 @@ public class CalendarEventService {
     }
 
     @Transactional(readOnly = true)
-    public List<CalendarEventResource> getUserEvents(String userEmail) {
+    public List<SimpleCalendarEventResource> getUserEvents(String userEmail) {
         return calendarEventRepository
             .findByUserEmail(userEmail)
             .stream()
-            .map(calendarEventMapper::mapCalendarEventToResource)
+            .map(calendarEventMappingUseCases::toSimpleCalendarEventResource)
             .collect(Collectors.toList());
     }
 

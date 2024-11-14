@@ -1,4 +1,4 @@
-package com.backend.calendar.event.util;
+package com.backend.calendar.event.mapping.internal;
 
 import com.backend.calendar.event.domain.Frequency;
 import lombok.Builder;
