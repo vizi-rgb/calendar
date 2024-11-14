@@ -2,13 +2,13 @@ package com.backend.calendar.event.dto;
 
 import lombok.Builder;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 public record SimpleCalendarEventResource(
     UUID id,
-    LocalDateTime startDateTime,
-    LocalDateTime endDateTime,
+    ZonedDateTime startDateTime,
+    ZonedDateTime endDateTime,
     String title,
     String description,
     String type
@@ -17,8 +17,8 @@ public record SimpleCalendarEventResource(
     @Builder
     SimpleCalendarEventResource(
         UUID id,
-        LocalDateTime startDateTime,
-        LocalDateTime endDateTime,
+        ZonedDateTime startDateTime,
+        ZonedDateTime endDateTime,
         String title,
         String description
     ) {

@@ -1,17 +1,18 @@
 package com.backend.calendar.event.web;
 
 import com.backend.calendar.event.dto.CreateCalendarEventRequest;
+import com.backend.calendar.event.dto.GetCalendarEventsRequest;
 import com.backend.calendar.event.dto.SimpleCalendarEventResource;
 import com.backend.calendar.event.dto.UpdateCalendarEventRequest;
 import com.backend.calendar.event.service.CalendarEventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -30,9 +31,12 @@ public class CalendarEventController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping
-    public ResponseEntity<List<SimpleCalendarEventResource>> getUserEvents(Principal principal) {
-        return ResponseEntity.ok(calendarEventService.getUserEvents(principal.getName()));
+    @GetMapping("/{userUuid}")
+    public ResponseEntity<Page<SimpleCalendarEventResource>> getUserEvents(
+        @PathVariable UUID userUuid,
+        GetCalendarEventsRequest request
+    ) {
+        return ResponseEntity.ok(calendarEventService.getUserEvents(request, userUuid));
     }
 
     @PatchMapping("/{eventId}")

@@ -1,13 +1,13 @@
 package com.backend.calendar.event.domain;
 
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 public interface Event {
-    LocalDateTime getStartDateTime();
+    ZonedDateTime getStartDateTime();
 
-    LocalDateTime getEndDateTime();
+    ZonedDateTime getEndDateTime();
 
     Frequency getFrequency();
 

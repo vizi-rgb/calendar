@@ -1,13 +1,22 @@
 package com.backend.calendar.calendar.calculations;
 
 import com.backend.calendar.event.domain.Event;
+import com.backend.calendar.event.dto.SimpleCalendarEventResource;
 import com.backend.calendar.task.domain.Task;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
-public interface CalendarCalculations<T> {
-    List<T> calculateEventsForPeriod(List<Event> events, LocalDateTime start, LocalDateTime end);
+public interface CalendarCalculations {
+    List<SimpleCalendarEventResource> calculateEventsForPeriod(
+        List<? extends Event> events,
+        ZonedDateTime start,
+        ZonedDateTime end
+    );
 
-    List<T> calculateTasksForPeriod(List<Task> tasks, LocalDateTime start, LocalDateTime end);
+    <T extends Task> List<SimpleCalendarEventResource> calculateTasksForPeriod(
+        List<T> tasks,
+        ZonedDateTime start,
+        ZonedDateTime end
+    );
 }

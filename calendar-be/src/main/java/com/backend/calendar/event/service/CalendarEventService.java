@@ -1,7 +1,9 @@
 package com.backend.calendar.event.service;
 
+import com.backend.calendar.calendar.calculations.CalendarCalculations;
 import com.backend.calendar.event.domain.CalendarEvent;
 import com.backend.calendar.event.dto.CreateCalendarEventRequest;
+import com.backend.calendar.event.dto.GetCalendarEventsRequest;
 import com.backend.calendar.event.dto.SimpleCalendarEventResource;
 import com.backend.calendar.event.dto.UpdateCalendarEventRequest;
 import com.backend.calendar.event.mapping.CalendarEventMappingUseCases;
@@ -9,12 +11,14 @@ import com.backend.calendar.event.repository.CalendarEventRepository;
 import com.backend.calendar.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -23,6 +27,7 @@ public class CalendarEventService {
 
     private final CalendarEventRepository calendarEventRepository;
     private final CalendarEventMappingUseCases calendarEventMappingUseCases;
+    private final CalendarCalculations calendarCalculations;
     private final UserRepository userRepository;
 
     @Transactional
@@ -40,12 +45,21 @@ public class CalendarEventService {
     }
 
     @Transactional(readOnly = true)
-    public List<SimpleCalendarEventResource> getUserEvents(String userEmail) {
-        return calendarEventRepository
-            .findByUserEmail(userEmail)
-            .stream()
-            .map(calendarEventMappingUseCases::toSimpleCalendarEventResource)
-            .collect(Collectors.toList());
+    public Page<SimpleCalendarEventResource> getUserEvents(GetCalendarEventsRequest request, UUID userUuid) {
+        final var userEvents = calendarEventRepository.findByUserUuid(userUuid);
+        final var simpleEvents = calendarCalculations.calculateEventsForPeriod(
+            userEvents,
+            request.from(),
+            request.to()
+        );
+
+        final var content = getEventSubList(simpleEvents, request.pageable());
+
+        return new PageImpl<>(
+            content,
+            request.pageable(),
+            simpleEvents.size()
+        );
     }
 
     @Transactional
@@ -96,5 +110,15 @@ public class CalendarEventService {
         if (request.description() != null) {
             event.setDescription(request.description());
         }
+    }
+
+    private List<SimpleCalendarEventResource> getEventSubList(
+        List<SimpleCalendarEventResource> events,
+        Pageable pageable
+    ) {
+        int start = Math.min((int) pageable.getOffset(), events.size());
+        int end = Math.min(start + pageable.getPageSize(), events.size());
+
+        return events.subList(start, end);
     }
 }

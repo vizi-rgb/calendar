@@ -5,7 +5,10 @@ import com.backend.calendar.event.dto.CreateCalendarEventRequest;
 import com.backend.calendar.event.dto.SimpleCalendarEventResource;
 import com.backend.calendar.event.mapping.CalendarEventMappingUseCases;
 import lombok.RequiredArgsConstructor;
+import net.fortuna.ical4j.model.Period;
 import org.springframework.stereotype.Component;
+
+import java.time.ZonedDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -23,5 +26,10 @@ class CalendarEventMappingService implements CalendarEventMappingUseCases {
     @Override
     public SimpleCalendarEventResource toSimpleCalendarEventResource(CalendarEvent calendarEvent) {
         return eventMapper.mapCalendarEventToSimpleCalendarEventResource(calendarEvent);
+    }
+
+    @Override
+    public SimpleCalendarEventResource toSimpleCalendarEventResource(Period<ZonedDateTime> period) {
+        return eventMapper.mapPeriodToSimpleCalendarEventResource(period);
     }
 }

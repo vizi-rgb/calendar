@@ -31,6 +31,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.12.5")
     implementation("com.google.api-client:google-api-client:2.6.0")
     implementation("org.mapstruct:mapstruct:1.6.0")
+    implementation("org.mnode.ical4j:ical4j:4.0.5")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
