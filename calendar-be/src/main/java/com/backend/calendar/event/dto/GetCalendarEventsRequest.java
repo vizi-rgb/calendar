@@ -1,12 +1,13 @@
 package com.backend.calendar.event.dto;
 
-import org.springframework.data.domain.Pageable;
+import jakarta.validation.constraints.NotNull;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public record GetCalendarEventsRequest(
-    ZonedDateTime from,
-    ZonedDateTime to,
-    Pageable pageable
+    @NotNull LocalDateTime from,
+    @NotNull LocalDateTime to,
+    @NotNull ZoneId zoneId
 ) {
 }

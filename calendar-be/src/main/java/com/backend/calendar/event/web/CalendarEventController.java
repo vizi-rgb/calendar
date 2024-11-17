@@ -8,6 +8,8 @@ import com.backend.calendar.event.service.CalendarEventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,9 +36,10 @@ public class CalendarEventController {
     @GetMapping("/{userUuid}")
     public ResponseEntity<Page<SimpleCalendarEventResource>> getUserEvents(
         @PathVariable UUID userUuid,
-        GetCalendarEventsRequest request
+        @PageableDefault Pageable pageable,
+        @RequestBody GetCalendarEventsRequest request
     ) {
-        return ResponseEntity.ok(calendarEventService.getUserEvents(request, userUuid));
+        return ResponseEntity.ok(calendarEventService.getUserEvents(request, userUuid, pageable));
     }
 
     @PatchMapping("/{eventId}")

@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,19 +46,19 @@ public class CalendarEventService {
     }
 
     @Transactional(readOnly = true)
-    public Page<SimpleCalendarEventResource> getUserEvents(GetCalendarEventsRequest request, UUID userUuid) {
+    public Page<SimpleCalendarEventResource> getUserEvents(GetCalendarEventsRequest request, UUID userUuid, Pageable pageable) {
         final var userEvents = calendarEventRepository.findByUserUuid(userUuid);
         final var simpleEvents = calendarCalculations.calculateEventsForPeriod(
             userEvents,
-            request.from(),
-            request.to()
+            ZonedDateTime.of(request.from(), request.zoneId()),
+            ZonedDateTime.of(request.to(), request.zoneId())
         );
 
-        final var content = getEventSubList(simpleEvents, request.pageable());
+        final var content = getEventSubList(simpleEvents, pageable);
 
         return new PageImpl<>(
             content,
-            request.pageable(),
+            pageable,
             simpleEvents.size()
         );
     }
