@@ -7,6 +7,8 @@ import net.fortuna.ical4j.model.WeekDay;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.TzId;
+import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.transform.recurrence.Frequency;
 import org.springframework.stereotype.Component;
 
@@ -30,13 +32,18 @@ class CalendarRRuleTranslator implements CalendarRRuleTranslations {
         final var recur = new Recur.Builder<>()
             .frequency(frequencyToICal4JFrequency(event.getFrequency()))
             .interval(event.getInterval())
-            .dayList(weekDays)
-            .build();
+            .dayList(weekDays);
 
-        final var rrule = new RRule<>(recur);
+        if (event.getFrequency() == com.backend.calendar.event.domain.Frequency.ONETIME) {
+            recur.count(1);
+        }
+
+        final var rrule = new RRule<>(recur.build());
 
         vEvent.add(new Description(event.getDescription()));
         vEvent.add(rrule);
+        vEvent.add(new TzId(event.getZoneId().toString()));
+        vEvent.add(new Uid(event.getUuid().toString()));
 
         return vEvent;
     }

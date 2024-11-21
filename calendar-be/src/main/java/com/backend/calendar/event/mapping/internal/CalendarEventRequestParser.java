@@ -23,6 +23,7 @@ class CalendarEventRequestParser implements CalendarEventRequestParsing {
             .title(request.title())
             .startDateTime(request.startDateTime())
             .endDateTime(request.endDateTime())
+            .zoneId(request.zoneId())
             .frequency(frequency)
             .interval(interval)
             .daysOfWeek(daysOfWeek)

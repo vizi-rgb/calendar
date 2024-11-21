@@ -7,15 +7,15 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 import java.time.DayOfWeek;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Builder
 public record UpdateCalendarEventRequest(
     Frequency frequency,
 
-    ZonedDateTime startDateTime,
-    ZonedDateTime endDateTime,
+    LocalDateTime startDateTime,
+    LocalDateTime endDateTime,
 
     @PositiveOrZero
     Integer interval,

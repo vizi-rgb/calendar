@@ -7,7 +7,8 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.DayOfWeek;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Set;
 import java.util.UUID;
 
@@ -27,9 +28,11 @@ public class CalendarEvent implements Event {
     private UUID uuid = UUID.randomUUID();
 
     @NotNull
-    private ZonedDateTime startDateTime;
+    private LocalDateTime startDateTime;
 
-    private ZonedDateTime endDateTime;
+    private LocalDateTime endDateTime;
+
+    private ZoneId zoneId;
 
     @Enumerated(EnumType.STRING)
     private Frequency frequency;

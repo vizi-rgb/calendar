@@ -1,13 +1,15 @@
 package com.backend.calendar.event.domain;
 
 import java.time.DayOfWeek;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Set;
+import java.util.UUID;
 
 public interface Event {
-    ZonedDateTime getStartDateTime();
+    LocalDateTime getStartDateTime();
 
-    ZonedDateTime getEndDateTime();
+    LocalDateTime getEndDateTime();
 
     Frequency getFrequency();
 
@@ -18,4 +20,8 @@ public interface Event {
     String getTitle();
 
     String getDescription();
+
+    ZoneId getZoneId();
+
+    UUID getUuid();
 }

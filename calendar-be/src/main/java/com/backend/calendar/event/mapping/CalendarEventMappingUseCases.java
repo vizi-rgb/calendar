@@ -5,12 +5,12 @@ import com.backend.calendar.event.dto.CreateCalendarEventRequest;
 import com.backend.calendar.event.dto.SimpleCalendarEventResource;
 import net.fortuna.ical4j.model.Period;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 public interface CalendarEventMappingUseCases {
     CalendarEvent toCalendarEvent(CreateCalendarEventRequest createCalendarEventRequest);
 
     SimpleCalendarEventResource toSimpleCalendarEventResource(CalendarEvent calendarEvent);
 
-    SimpleCalendarEventResource toSimpleCalendarEventResource(Period<ZonedDateTime> period);
+    SimpleCalendarEventResource toSimpleCalendarEventResource(Period<LocalDateTime> period);
 }

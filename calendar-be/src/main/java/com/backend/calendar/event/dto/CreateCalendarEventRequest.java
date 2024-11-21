@@ -3,13 +3,15 @@ package com.backend.calendar.event.dto;
 import com.backend.calendar.event.domain.Frequency;
 import lombok.Builder;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Builder
 public record CreateCalendarEventRequest(
     String title,
-    ZonedDateTime startDateTime,
-    ZonedDateTime endDateTime,
+    LocalDateTime startDateTime,
+    LocalDateTime endDateTime,
+    ZoneId zoneId,
     Boolean isRepetitive,
     Frequency frequency,
     String description,

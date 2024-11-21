@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import net.fortuna.ical4j.model.Period;
 import org.springframework.stereotype.Component;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -29,7 +29,7 @@ class CalendarEventMappingService implements CalendarEventMappingUseCases {
     }
 
     @Override
-    public SimpleCalendarEventResource toSimpleCalendarEventResource(Period<ZonedDateTime> period) {
+    public SimpleCalendarEventResource toSimpleCalendarEventResource(Period<LocalDateTime> period) {
         return eventMapper.mapPeriodToSimpleCalendarEventResource(period);
     }
 }

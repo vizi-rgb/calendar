@@ -22,6 +22,8 @@ export const EventFormSchema = object({
 
   description: string().max(500, "Maksymalnie 500 znaków"),
 
+  zoneId: string().default(Intl.DateTimeFormat().resolvedOptions().timeZone),
+
   customFrequency: object({
     interval: number(),
     frequency: mixed<Frequency>(),

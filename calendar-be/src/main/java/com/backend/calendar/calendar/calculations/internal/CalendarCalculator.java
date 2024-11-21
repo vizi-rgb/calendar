@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import net.fortuna.ical4j.model.Period;
 import org.springframework.stereotype.Component;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -20,13 +20,14 @@ class CalendarCalculator implements CalendarCalculations {
     private final CalendarEventMappingUseCases eventMappingUseCases;
 
     @Override
-    public List<SimpleCalendarEventResource> calculateEventsForPeriod(List<? extends Event> events, ZonedDateTime start, ZonedDateTime end) {
+    public List<SimpleCalendarEventResource> calculateEventsForPeriod(List<? extends Event> events, LocalDateTime start, LocalDateTime end) {
         final var period = new Period<>(start, end);
+
         final var rruleEvents = translations.translateToRRuleEvents(events);
         final var periodList = rruleEvents.stream()
             .flatMap(
                 vEvent ->
-                    vEvent.<ZonedDateTime>calculateRecurrenceSet(period).stream()
+                    vEvent.<LocalDateTime>calculateRecurrenceSet(period).stream()
             )
             .toList();
 
@@ -36,7 +37,7 @@ class CalendarCalculator implements CalendarCalculations {
     }
 
     @Override
-    public <T extends Task> List<SimpleCalendarEventResource> calculateTasksForPeriod(List<T> tasks, ZonedDateTime start, ZonedDateTime end) {
+    public <T extends Task> List<SimpleCalendarEventResource> calculateTasksForPeriod(List<T> tasks, LocalDateTime start, LocalDateTime end) {
         return List.of();
     }
 
