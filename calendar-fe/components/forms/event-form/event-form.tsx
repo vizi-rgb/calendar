@@ -14,7 +14,7 @@ import EventDatePicker from "@/components/forms/event-form/event-date-picker";
 import EventFrequencySelect, {
   SelectOption,
 } from "@/components/forms/event-form/event-frequency-select";
-import { ChangeEvent } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import { useAppSelector } from "@/lib/hooks";
 import EventService from "@/services/event-service";
 import { AxiosResponse } from "axios";
@@ -47,6 +47,14 @@ const getTimeString = (date: Date): string => {
 
 export const AddEventForm = () => {
   const currentHour = new Date().getHours();
+  const [startTime, setStartTime] = useState<{ hour: number; minute: number }>({
+    hour: 0,
+    minute: 0,
+  });
+  const [endTime, setEndTime] = useState<{ hour: number; minute: number }>({
+    hour: 0,
+    minute: 0,
+  });
 
   const {
     control,
@@ -78,6 +86,31 @@ export const AddEventForm = () => {
 
   const onSubmit = (data: any) => {
     const eventService = new EventService();
+    const startDate = getValues("startDateTime");
+    const endDate = getValues("endDateTime");
+
+    const startDateTimeUtc = new Date(
+      Date.UTC(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate(),
+        startTime.hour,
+        startTime.minute,
+      ),
+    );
+    const endDateTimeUtc = new Date(
+      Date.UTC(
+        endDate.getFullYear(),
+        endDate.getMonth(),
+        endDate.getDate(),
+        endTime.hour,
+        endTime.minute,
+      ),
+    );
+
+    setValue("startDateTime", startDateTimeUtc);
+    setValue("endDateTime", endDateTimeUtc);
+
     eventService
       .createEvent(data, authToken!)
       .then((response: AxiosResponse) => {
@@ -86,14 +119,19 @@ export const AddEventForm = () => {
       });
   };
 
-  const onTimeInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onTimeInputChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    action: Dispatch<SetStateAction<{ hour: number; minute: number }>>,
+  ) => {
     const hour: number = Number.parseInt(e.target.value.slice(0, 2));
-
     const minute: number = Number.parseInt(e.target.value.slice(3, 5));
 
-    const startDate = getValues("startDateTime");
-    startDate.setHours(hour, minute);
-    setValue("startDateTime", startDate);
+    action({ hour, minute });
+
+    // const startDate = getValues("startDateTime");
+    // startDate.setHours(hour, minute);
+    // console.log(startDate);
+    // setValue("startDateTime", startDate);
   };
 
   return (
@@ -122,7 +160,7 @@ export const AddEventForm = () => {
               type="time"
               className="max-w-max"
               defaultValue={getTimeString(getValues("startDateTime"))}
-              onChange={onTimeInputChange}
+              onChange={(e) => onTimeInputChange(e, setStartTime)}
             />
           </div>
           {errors.startDateTime && (
@@ -147,7 +185,7 @@ export const AddEventForm = () => {
               type="time"
               className="max-w-max"
               defaultValue={getTimeString(getValues("endDateTime"))}
-              onChange={onTimeInputChange}
+              onChange={(e) => onTimeInputChange(e, setEndTime)}
             />
           </div>
           {errors.endDateTime && (

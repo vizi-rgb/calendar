@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import StoreProvider from "@/app/store-provider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import StoreInitializer from "@/app/store-initializer";
+import ReactQueryProvider from "@/app/react-query-provider";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -34,9 +35,11 @@ export default function RootLayout({
         >
           <StoreProvider>
             <StoreInitializer>
-              <GoogleOAuthProvider clientId={clientId}>
-                {children}
-              </GoogleOAuthProvider>
+              <ReactQueryProvider>
+                <GoogleOAuthProvider clientId={clientId}>
+                  {children}
+                </GoogleOAuthProvider>
+              </ReactQueryProvider>
             </StoreInitializer>
           </StoreProvider>
         </ThemeProvider>

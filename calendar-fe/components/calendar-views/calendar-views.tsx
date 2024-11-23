@@ -1,15 +1,9 @@
 "use client";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { useAppSelector } from "@/lib/hooks";
 import { TimelineOption } from "@/constants/timeline-option";
 import * as React from "react";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-import {
-  nextDate,
-  nextTimeline,
-  previousDate,
-  previousTimeline,
-} from "@/lib/features/calendar/calendar-slice";
 import { days, DayType, months } from "@/constants/calendar-view-contants";
 import {
   Calendar as BigCalendar,
@@ -20,7 +14,10 @@ import {
 } from "react-big-calendar";
 import "./custom-calendar.css";
 import "moment/locale/pl";
-import moment from "moment";
+import moment from "moment-timezone";
+import { GetEventsResponse } from "@/api/event/event-dto";
+import { useQuery } from "react-query";
+import eventApi from "@/api/event/event-api";
 
 type DateFormatFn = (
   date: Date,
@@ -41,6 +38,10 @@ const timelineOptionToBigCalendarView = (option: TimelineOption): View => {
     default:
       return Views.WEEK;
   }
+};
+
+const convertToZonedDateTime = (utcDate: Date, zoneId: string): Date => {
+  return moment.utc(utcDate).tz(zoneId).toDate();
 };
 
 const daysInMonth = (month: number, year: number): number => {
@@ -129,128 +130,6 @@ const YearView = ({ date }: { date: Date }) => {
     </div>
   );
 };
-
-const MonthView = ({ date }: { date: Date }) => {
-  const currentDate = new Date();
-  const daysArray = calculateDayArray(date.getMonth(), date.getFullYear());
-  let key = 1;
-
-  const isToday = (day: number, month: number) => {
-    return (
-      day === currentDate.getDate() &&
-      month === currentDate.getMonth() &&
-      date.getFullYear() === currentDate.getFullYear()
-    );
-  };
-
-  return (
-    <div className="grid grid-cols-7 grid-rows-[auto] auto-rows-fr h-full gap-px">
-      {range(0, 6).map((number) => (
-        <p key={number} className="p-2 font-bold border-b mb-1">
-          {days[number]}
-        </p>
-      ))}
-
-      {daysArray.map(([day, type]) => (
-        <div
-          key={key++}
-          className={cn(
-            "p-2 hover:bg-accent rounded-lg",
-            type === DayType.PREVIOUS ? "text-muted" : "",
-            type === DayType.NEXT ? "text-muted" : "",
-            isToday(day, date.getMonth()) && type == DayType.CURRENT
-              ? "bg-accent"
-              : "",
-          )}
-        >
-          {day}
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const WeekView = () => {
-  return (
-    <div className="grid grid-cols-7 auto-rows-min">
-      {range(0, 6).map((number) => (
-        <p key={number} className="p-2 font-bold border-b mb-1">
-          {days[number]}
-        </p>
-      ))}
-    </div>
-  );
-};
-
-const WorkWeekView = () => {
-  return (
-    <div className="grid grid-cols-5 auto-rows-min">
-      {range(0, 4).map((number) => (
-        <p key={number} className="p-2 font-bold border-b mb-1">
-          {days[number]}
-        </p>
-      ))}
-    </div>
-  );
-};
-
-const DayView = () => {
-  return (
-    <div className="grid grid-cols-1 grid-rows-[24] gap-20">
-      {range(0, 0).map((number) => (
-        <p key={number} className="p-2 font-bold border-b mb-1">
-          {days[number]}
-        </p>
-      ))}
-    </div>
-  );
-};
-
-export default function CalendarViews() {
-  let selectedView = useAppSelector((state) => state.calendar.timeline);
-  const dateString: string = useAppSelector((state) => state.calendar.date);
-  const date: Date = new Date(dateString);
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case "ArrowRight":
-          dispatch(nextDate());
-          break;
-        case "ArrowLeft":
-          dispatch(previousDate());
-          break;
-        case "ArrowUp":
-          dispatch(nextTimeline());
-          break;
-        case "ArrowDown":
-          dispatch(previousTimeline());
-          break;
-      }
-    };
-
-    document.addEventListener("keydown", down);
-
-    return () => document.removeEventListener("keydown", down);
-  }, []);
-
-  switch (selectedView) {
-    case TimelineOption.Year:
-      return <YearView date={date} />;
-    case TimelineOption.Month:
-      return <MonthView date={date} />;
-    case TimelineOption.Week:
-      return <WeekView />;
-    case TimelineOption.WorkWeek:
-      return <WorkWeekView />;
-    case TimelineOption.Day:
-      return <DayView />;
-    default:
-      return <WeekView />;
-  }
-}
-
 export function MyBigCalendarViewsWrapper() {
   const selectedView: TimelineOption = useAppSelector(
     (state) => state.calendar.timeline,
@@ -260,14 +139,39 @@ export function MyBigCalendarViewsWrapper() {
     useAppSelector((state) => state.calendar.date),
   );
 
+  const authorization = useAppSelector((state) => state.authorization);
+  const userUuid = authorization?.user?.userId ?? null;
+  const authToken = authorization?.accessToken ?? null;
+
+  const today = new Date();
+  const from = new Date(
+    today.getFullYear() - 1,
+    today.getMonth(),
+    1,
+  ).toISOString();
+  const to = new Date(
+    today.getFullYear() + 1,
+    today.getMonth(),
+    1,
+  ).toISOString();
+  const zoneId = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const query = useQuery(["events", userUuid, from, to, zoneId], () =>
+    eventApi.getEvents(userUuid, { from, to, zoneId }, authToken),
+  );
+
   if (selectedView === TimelineOption.Year) {
     return <YearView date={selectedDate} />;
   }
 
-  return <MyBigCalendarViews />;
+  return <MyBigCalendarViews events={query.data?.content ?? []} />;
 }
 
-export function MyBigCalendarViews() {
+export function MyBigCalendarViews({
+  events,
+}: {
+  events: GetEventsResponse[];
+}) {
   moment.locale("pl");
   const localizer = momentLocalizer(moment);
 
@@ -288,35 +192,26 @@ export function MyBigCalendarViews() {
   const selectedDate = useAppSelector((state) => state.calendar.date);
 
   let bigCalendarView: View = timelineOptionToBigCalendarView(selectedView);
-
-  const today = new Date();
-  today.setHours(10, 30);
-  const next = new Date();
-  next.setHours(12, 30);
-  const events = [
-    {
-      title: "Test",
-      start: today,
-      end: next,
-    },
-    {
-      title: "Siema",
-      start: new Date(2024, 8, 4),
-      end: new Date(2024, 8, 4),
-    },
-  ];
+  console.log("getEventsResponse", events);
 
   return (
     <BigCalendar
       localizer={localizer}
       events={events}
-      startAccessor="start"
+      startAccessor={(event) =>
+        convertToZonedDateTime(new Date(event.startDateTime), event.zoneId)
+      }
+      endAccessor={(event) =>
+        convertToZonedDateTime(new Date(event.endDateTime), event.zoneId)
+      }
+      titleAccessor={(event) => event.title}
+      allDayAccessor={() => false}
+      resourceAccessor={() => ""}
       toolbar={false}
       formats={formats}
       date={selectedDate}
       view={bigCalendarView}
       views={[Views.MONTH, Views.WEEK, Views.WORK_WEEK, Views.DAY]}
-      endAccessor="end"
       scrollToTime={new Date()}
     />
   );
