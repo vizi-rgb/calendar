@@ -37,7 +37,7 @@ public class CalendarEventController {
     public ResponseEntity<Page<SimpleCalendarEventResource>> getUserEvents(
         @PathVariable UUID userUuid,
         @PageableDefault Pageable pageable,
-        @RequestBody GetCalendarEventsRequest request
+        GetCalendarEventsRequest request
     ) {
         return ResponseEntity.ok(calendarEventService.getUserEvents(request, userUuid, pageable));
     }
