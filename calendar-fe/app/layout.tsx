@@ -4,7 +4,6 @@ import { Inter as FontSans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import StoreProvider from "@/app/store-provider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import StoreInitializer from "@/app/store-initializer";
 import ReactQueryProvider from "@/app/react-query-provider";
 
 const fontSans = FontSans({
@@ -34,13 +33,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <StoreProvider>
-            <StoreInitializer>
-              <ReactQueryProvider>
-                <GoogleOAuthProvider clientId={clientId}>
-                  {children}
-                </GoogleOAuthProvider>
-              </ReactQueryProvider>
-            </StoreInitializer>
+            <ReactQueryProvider>
+              <GoogleOAuthProvider clientId={clientId}>
+                {children}
+              </GoogleOAuthProvider>
+            </ReactQueryProvider>
           </StoreProvider>
         </ThemeProvider>
       </body>

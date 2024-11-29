@@ -42,8 +42,6 @@ const timelineOptionToBigCalendarView = (option: TimelineOption): View => {
 };
 
 const convertToZonedDateTime = (utcDate: Date, zoneId: string): Date => {
-  console.log("UTC", utcDate);
-  console.log("Zone", moment.utc(utcDate).tz(zoneId).toDate());
   return moment.utc(utcDate).tz(zoneId).toDate();
 };
 
@@ -89,7 +87,6 @@ const YearView = ({ date }: { date: Date }) => {
   const day = date.getDate();
   const year = date.getFullYear();
   let key = 1;
-  console.log(date);
 
   const currentDate = new Date();
   const { currentMonth, currentDay, currentYear } = {
