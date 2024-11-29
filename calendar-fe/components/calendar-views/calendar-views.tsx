@@ -16,8 +16,9 @@ import "./custom-calendar.css";
 import "moment/locale/pl";
 import moment from "moment-timezone";
 import { GetEventsResponse } from "@/api/event/event-dto";
-import { useQuery } from "react-query";
-import eventApi from "@/api/event/event-api";
+import { useEventsQuery } from "@/api/event/event-query";
+import { toUtcDateWithoutChangingTime } from "@/util/calendar-utils";
+import { PageableRequest } from "@/api/pageable";
 
 type DateFormatFn = (
   date: Date,
@@ -41,6 +42,8 @@ const timelineOptionToBigCalendarView = (option: TimelineOption): View => {
 };
 
 const convertToZonedDateTime = (utcDate: Date, zoneId: string): Date => {
+  console.log("UTC", utcDate);
+  console.log("Zone", moment.utc(utcDate).tz(zoneId).toDate());
   return moment.utc(utcDate).tz(zoneId).toDate();
 };
 
@@ -145,26 +148,39 @@ export function MyBigCalendarViewsWrapper() {
 
   const today = new Date();
   const from = new Date(
-    today.getFullYear() - 1,
-    today.getMonth(),
+    today.getFullYear(),
+    today.getMonth() - 6,
     1,
   ).toISOString();
   const to = new Date(
-    today.getFullYear() + 1,
-    today.getMonth(),
+    today.getFullYear(),
+    today.getMonth() + 6,
     1,
   ).toISOString();
   const zoneId = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const query = useQuery(["events", userUuid, from, to, zoneId], () =>
-    eventApi.getEvents(userUuid, { from, to, zoneId }, authToken),
+  const pageable: PageableRequest = {
+    page: 0,
+    size: 500,
+  };
+
+  const query = useEventsQuery(
+    userUuid,
+    {
+      from,
+      to,
+      zoneId,
+    },
+    authToken,
+    pageable,
   );
 
   if (selectedView === TimelineOption.Year) {
     return <YearView date={selectedDate} />;
   }
 
-  return <MyBigCalendarViews events={query.data?.content ?? []} />;
+  const events = (query ? query.data?.content : []) ?? [];
+  return <MyBigCalendarViews events={events} />;
 }
 
 export function MyBigCalendarViews({
@@ -192,17 +208,22 @@ export function MyBigCalendarViews({
   const selectedDate = useAppSelector((state) => state.calendar.date);
 
   let bigCalendarView: View = timelineOptionToBigCalendarView(selectedView);
-  console.log("getEventsResponse", events);
 
   return (
     <BigCalendar
       localizer={localizer}
       events={events}
       startAccessor={(event) =>
-        convertToZonedDateTime(new Date(event.startDateTime), event.zoneId)
+        convertToZonedDateTime(
+          toUtcDateWithoutChangingTime(new Date(event.startDateTime)),
+          event.zoneId,
+        )
       }
       endAccessor={(event) =>
-        convertToZonedDateTime(new Date(event.endDateTime), event.zoneId)
+        convertToZonedDateTime(
+          toUtcDateWithoutChangingTime(new Date(event.endDateTime)),
+          event.zoneId,
+        )
       }
       titleAccessor={(event) => event.title}
       allDayAccessor={() => false}

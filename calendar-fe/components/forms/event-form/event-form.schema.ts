@@ -1,6 +1,16 @@
-import { array, boolean, date, mixed, number, object, string } from "yup";
+import {
+  array,
+  boolean,
+  date,
+  InferType,
+  mixed,
+  number,
+  object,
+  string,
+} from "yup";
 import { Frequency } from "@/constants/event-constants";
 import { daysEN } from "@/constants/calendar-view-contants";
+import { combineDateAndTime } from "@/util/calendar-utils";
 
 export const EventFormSchema = object({
   title: string()
@@ -12,9 +22,17 @@ export const EventFormSchema = object({
     )
     .max(100, "Maksymalnie 100 znaków"),
 
-  startDateTime: date().required("Data rozpoczęcia jest wymagana"),
+  startDate: date().required("Data rozpoczęcia jest wymagana"),
 
-  endDateTime: date().required("Data zakończenia jest wymagana"),
+  startTime: string()
+    .required("Czas rozpoczęcia jest wymagany")
+    .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Nieprawidłowy format czasu"),
+
+  endDate: date().required("Data zakończenia jest wymagana"),
+
+  endTime: string()
+    .required("Czas zakończenia jest wymagany")
+    .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Nieprawidłowy format czasu"),
 
   isRepetitive: boolean().required("Czy powtarzalne jest wymagane"),
 
@@ -40,4 +58,26 @@ export const EventFormSchema = object({
       }),
     otherwise: () => object().notRequired(),
   }),
+}).test("end-date-time-after-start", function (values) {
+  if (
+    values.startDate &&
+    values.startTime &&
+    values.endDate &&
+    values.endTime
+  ) {
+    const startDateTime = combineDateAndTime(
+      values.startDate,
+      values.startTime,
+    );
+    const endDateTime = combineDateAndTime(values.endDate, values.endTime);
+    if (endDateTime <= startDateTime) {
+      return this.createError({
+        path: "endDate",
+        message: "Data i czas zakończenia muszą być późniejsze niż rozpoczęcia",
+      });
+    }
+  }
+  return true;
 });
+
+export type EventFormSchemaData = InferType<typeof EventFormSchema>;

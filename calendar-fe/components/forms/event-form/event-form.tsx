@@ -9,16 +9,18 @@ import { Frequency } from "@/constants/event-constants";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { If, Then } from "react-if";
-import { EventFormSchema } from "@/components/forms/event-form/event-form.schema";
+import {
+  EventFormSchema,
+  EventFormSchemaData,
+} from "@/components/forms/event-form/event-form.schema";
 import EventDatePicker from "@/components/forms/event-form/event-date-picker";
 import EventFrequencySelect, {
   SelectOption,
 } from "@/components/forms/event-form/event-frequency-select";
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import { useAppSelector } from "@/lib/hooks";
-import EventService from "@/services/event-service";
-import { AxiosResponse } from "axios";
 import { ErrorMessageText } from "@/util/validation-utils";
+import { combineDateAndTime } from "@/util/calendar-utils";
+import { useEventMutation } from "@/api/event/event-mutation";
 
 const selectOptions: SelectOption[] = [
   { value: Frequency.DAILY, label: "Codziennie" },
@@ -47,29 +49,22 @@ const getTimeString = (date: Date): string => {
 
 export const AddEventForm = () => {
   const currentHour = new Date().getHours();
-  const [startTime, setStartTime] = useState<{ hour: number; minute: number }>({
-    hour: 0,
-    minute: 0,
-  });
-  const [endTime, setEndTime] = useState<{ hour: number; minute: number }>({
-    hour: 0,
-    minute: 0,
-  });
 
   const {
     control,
     handleSubmit,
     register,
     watch,
-    getValues,
     setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(EventFormSchema),
     reValidateMode: "onChange",
     defaultValues: {
-      startDateTime: getToday(currentHour + 1, 0),
-      endDateTime: getToday(currentHour + 2, 0),
+      startDate: getToday(currentHour + 1, 0),
+      endDate: getToday(currentHour + 2, 0),
+      startTime: getTimeString(getToday(currentHour + 1, 0)),
+      endTime: getTimeString(getToday(currentHour + 2, 0)),
       frequency: Frequency.ONETIME,
       isRepetitive: false,
       customFrequency: {
@@ -83,55 +78,27 @@ export const AddEventForm = () => {
   const isRepetitiveWatch: boolean = watch("isRepetitive");
   const frequencyWatch: Frequency = watch("frequency");
   const authToken = useAppSelector((state) => state.authorization.accessToken);
+  const eventMutation = useEventMutation();
 
-  const onSubmit = (data: any) => {
-    const eventService = new EventService();
-    const startDate = getValues("startDateTime");
-    const endDate = getValues("endDateTime");
+  const onSubmit = (data: EventFormSchemaData) => {
+    console.log(combineDateAndTime(data.startDate, data.startTime));
+    const startDateTime = combineDateAndTime(
+      data.startDate,
+      data.startTime,
+    ).toISOString();
 
-    const startDateTimeUtc = new Date(
-      Date.UTC(
-        startDate.getFullYear(),
-        startDate.getMonth(),
-        startDate.getDate(),
-        startTime.hour,
-        startTime.minute,
-      ),
-    );
-    const endDateTimeUtc = new Date(
-      Date.UTC(
-        endDate.getFullYear(),
-        endDate.getMonth(),
-        endDate.getDate(),
-        endTime.hour,
-        endTime.minute,
-      ),
-    );
+    const endDateTime = combineDateAndTime(
+      data.endDate,
+      data.endTime,
+    ).toISOString();
 
-    setValue("startDateTime", startDateTimeUtc);
-    setValue("endDateTime", endDateTimeUtc);
+    const event = {
+      ...data,
+      startDateTime,
+      endDateTime,
+    };
 
-    eventService
-      .createEvent(data, authToken!)
-      .then((response: AxiosResponse) => {
-        console.log("Event created");
-        console.log(response);
-      });
-  };
-
-  const onTimeInputChange = (
-    e: ChangeEvent<HTMLInputElement>,
-    action: Dispatch<SetStateAction<{ hour: number; minute: number }>>,
-  ) => {
-    const hour: number = Number.parseInt(e.target.value.slice(0, 2));
-    const minute: number = Number.parseInt(e.target.value.slice(3, 5));
-
-    action({ hour, minute });
-
-    // const startDate = getValues("startDateTime");
-    // startDate.setHours(hour, minute);
-    // console.log(startDate);
-    // setValue("startDateTime", startDate);
+    eventMutation.mutate({ event, authToken });
   };
 
   return (
@@ -147,7 +114,7 @@ export const AddEventForm = () => {
           <div className="flex flex-row gap-x-2">
             <Controller
               control={control}
-              name="startDateTime"
+              name="startDate"
               render={({ field: { onChange, onBlur, value } }) => (
                 <EventDatePicker
                   value={value}
@@ -159,12 +126,14 @@ export const AddEventForm = () => {
             <Input
               type="time"
               className="max-w-max"
-              defaultValue={getTimeString(getValues("startDateTime"))}
-              onChange={(e) => onTimeInputChange(e, setStartTime)}
+              {...register("startTime")}
             />
           </div>
-          {errors.startDateTime && (
-            <ErrorMessageText message={errors.startDateTime.message} />
+          {errors.startDate && (
+            <ErrorMessageText message={errors.startDate.message} />
+          )}
+          {errors.startTime && (
+            <ErrorMessageText message={errors.startTime.message} />
           )}
         </div>
         <div className="grid gap-2">
@@ -172,7 +141,7 @@ export const AddEventForm = () => {
           <div className="flex flex-row gap-x-2">
             <Controller
               control={control}
-              name="endDateTime"
+              name="endDate"
               render={({ field: { onChange, onBlur, value } }) => (
                 <EventDatePicker
                   value={value}
@@ -181,15 +150,13 @@ export const AddEventForm = () => {
                 />
               )}
             />
-            <Input
-              type="time"
-              className="max-w-max"
-              defaultValue={getTimeString(getValues("endDateTime"))}
-              onChange={(e) => onTimeInputChange(e, setEndTime)}
-            />
+            <Input type="time" className="max-w-max" {...register("endTime")} />
           </div>
-          {errors.endDateTime && (
-            <ErrorMessageText message={errors.endDateTime.message} />
+          {errors.endDate && (
+            <ErrorMessageText message={errors.endDate.message} />
+          )}
+          {errors.endTime && (
+            <ErrorMessageText message={errors.endTime.message} />
           )}
         </div>
         <Controller

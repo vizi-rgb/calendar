@@ -13,6 +13,12 @@ interface Pageable {
   unpaged: boolean;
 }
 
+export interface PageableRequest {
+  page?: number | undefined;
+  size?: number | undefined;
+  sort?: string | undefined;
+}
+
 export default interface Page<T> {
   content: T[];
   pageable: Pageable;
