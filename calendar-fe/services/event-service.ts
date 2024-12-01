@@ -1,5 +1,5 @@
 import axios, { AxiosHeaders, AxiosInstance, AxiosResponse } from "axios";
-import endpoints from "@/endpoints";
+import endpoints from "@/api/endpoints";
 import { EventFormSchema } from "@/components/forms/event-form/event-form.schema";
 import { TaskFormSchema } from "@/components/forms/task-form/task-form.schema";
 

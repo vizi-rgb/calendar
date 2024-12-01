@@ -15,10 +15,11 @@ import {
 import "./custom-calendar.css";
 import "moment/locale/pl";
 import moment from "moment-timezone";
-import { GetEventsResponse } from "@/api/event/event-dto";
+import { GetEventsRequest, GetEventsResponse } from "@/api/event/event-dto";
 import { useEventsQuery } from "@/api/event/event-query";
 import { toUtcDateWithoutChangingTime } from "@/util/calendar-utils";
 import { PageableRequest } from "@/api/pageable";
+import { useRouter } from "next/navigation";
 
 type DateFormatFn = (
   date: Date,
@@ -130,47 +131,42 @@ const YearView = ({ date }: { date: Date }) => {
     </div>
   );
 };
+
+const withDefaultPeriod = (date: Date): GetEventsRequest => {
+  return {
+    from: new Date(Date.UTC(date.getFullYear(), 0, 1)).toISOString(),
+    to: new Date(Date.UTC(date.getFullYear(), 11, 31)).toISOString(),
+    zoneId: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  };
+};
+
+const withDefaultPageable = (): PageableRequest => {
+  return {
+    page: 0,
+    size: 500,
+  };
+};
+
 export function MyBigCalendarViewsWrapper() {
   const selectedView: TimelineOption = useAppSelector(
     (state) => state.calendar.timeline,
   );
 
+  const router = useRouter();
+
   const selectedDate: Date = new Date(
     useAppSelector((state) => state.calendar.date),
   );
 
+  const defaultPeriod = useMemo(
+    () => withDefaultPeriod(selectedDate),
+    [selectedDate.getFullYear()],
+  );
+
   const authorization = useAppSelector((state) => state.authorization);
   const userUuid = authorization?.user?.userId ?? null;
-  const authToken = authorization?.accessToken ?? null;
 
-  const today = new Date();
-  const from = new Date(
-    today.getFullYear(),
-    today.getMonth() - 6,
-    1,
-  ).toISOString();
-  const to = new Date(
-    today.getFullYear(),
-    today.getMonth() + 6,
-    1,
-  ).toISOString();
-  const zoneId = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  const pageable: PageableRequest = {
-    page: 0,
-    size: 500,
-  };
-
-  const query = useEventsQuery(
-    userUuid,
-    {
-      from,
-      to,
-      zoneId,
-    },
-    authToken,
-    pageable,
-  );
+  const query = useEventsQuery(userUuid, defaultPeriod, withDefaultPageable());
 
   if (selectedView === TimelineOption.Year) {
     return <YearView date={selectedDate} />;

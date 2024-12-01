@@ -4,7 +4,7 @@ import {
   GoogleIdTokenRequest,
   GoogleIdTokenResponse,
 } from "@/dto/auth";
-import endpoints from "@/endpoints";
+import endpoints from "@/api/endpoints";
 
 const oauthClient = axios.create({
   baseURL: endpoints.OAUTH_URL,

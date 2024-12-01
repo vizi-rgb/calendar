@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import endpoints from "../endpoints";
+import endpoints from "../api/endpoints";
 import User from "@/dto/user";
 import jwt from "jsonwebtoken";
 
