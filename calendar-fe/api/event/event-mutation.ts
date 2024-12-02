@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "react-query";
 import { EventFormSchemaData } from "@/components/forms/event-form/event-form.schema";
 import { AxiosHeaders } from "axios";
-import { useEventApiClient } from "@/api/event/event-axios";
+import { useEventApiClient } from "@/api/event/event-axios.config";
 
 export const useEventMutation = () => {
   const queryClient = useQueryClient();

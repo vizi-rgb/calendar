@@ -19,6 +19,7 @@ const userApiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 const UserService = {
@@ -56,6 +57,10 @@ const UserService = {
 
   verifyEmail: (userId: string, token: string) =>
     userApiClient.post(`/v1/${userId}/verify/${token}`),
+
+  refresh() {
+    return userApiClient.post("/v1/refresh");
+  },
 };
 
 export default UserService;

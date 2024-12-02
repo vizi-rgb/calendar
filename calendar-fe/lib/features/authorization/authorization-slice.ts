@@ -23,9 +23,12 @@ const authorizationSlice = createSlice({
     clearAuthorizedUser(state) {
       state.accessToken = null;
     },
+    setAccessToken(state, action: PayloadAction<string>) {
+      state.accessToken = action.payload;
+    },
   },
 });
 
-export const { storeAuthorizedUser, clearAuthorizedUser } =
+export const { storeAuthorizedUser, clearAuthorizedUser, setAccessToken } =
   authorizationSlice.actions;
 export default authorizationSlice.reducer;
