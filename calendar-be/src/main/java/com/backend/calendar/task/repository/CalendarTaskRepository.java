@@ -12,5 +12,7 @@ import java.util.UUID;
 public interface CalendarTaskRepository extends JpaRepository<CalendarTask, Long> {
     List<CalendarTask> findByUserEmail(String userEmail);
 
+    List<CalendarTask> findByUserUuid(UUID userUuid);
+
     Optional<CalendarTask> findByUuidAndUserEmail(UUID uuid, String userEmail);
 }

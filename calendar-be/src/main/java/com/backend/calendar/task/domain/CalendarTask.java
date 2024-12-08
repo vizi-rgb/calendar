@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
 @Entity
@@ -36,6 +37,8 @@ public class CalendarTask implements Task {
 
     @Size(max = 500)
     private String description;
+
+    private ZoneId zoneId;
 
     @ManyToOne
     private User user;

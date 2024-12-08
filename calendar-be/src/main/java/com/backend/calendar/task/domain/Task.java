@@ -1,15 +1,11 @@
 package com.backend.calendar.task.domain;
 
-import java.time.LocalDateTime;
+import com.backend.calendar.calendar.domain.Schedulable;
 
-public interface Task {
-    LocalDateTime getStartDateTime();
+import java.util.UUID;
 
-    LocalDateTime getEndDateTime();
-
+public interface Task extends Schedulable {
     boolean isDone();
 
-    String getTitle();
-
-    String getDescription();
+    UUID getUuid();
 }

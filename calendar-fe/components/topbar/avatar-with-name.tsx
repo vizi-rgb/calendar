@@ -14,7 +14,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { clearAuthorizedUser } from "@/lib/features/authorization/authorization-slice";
 import { useRouter } from "next/navigation";
 import {
@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
 import { ROUTES } from "@/constants/route-contants";
+import { useCalendarExportMutation } from "@/api/calendar/calendar-mutation";
 
 const LogoutAlert = ({
   open,
@@ -77,6 +78,8 @@ function DropdownForAvatar({
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.authorization.user);
+  const exportCalendar = useCalendarExportMutation();
   const router = useRouter();
   const handleLogout = () => {
     router.push(ROUTES.LOGIN);
@@ -120,6 +123,11 @@ function DropdownForAvatar({
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
             </DropdownMenuSub>
+            <DropdownMenuItem
+              onClick={() => exportCalendar.mutate(user.userId)}
+            >
+              Eksportuj kalendarz
+            </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Co nowego? </DropdownMenuItem>

@@ -5,6 +5,7 @@ const endpoints = {
   OAUTH_URL: `${BASE_URL}/user/oauth2`,
   EVENT_URL: `${BASE_URL}/event`,
   TASK_URL: `${BASE_URL}/task`,
+  CALENDAR_URL: `${BASE_URL}/calendar`,
 };
 
 export default endpoints;
