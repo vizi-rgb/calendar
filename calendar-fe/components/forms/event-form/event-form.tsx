@@ -19,7 +19,10 @@ import EventFrequencySelect, {
 } from "@/components/forms/event-form/event-frequency-select";
 import { useAppSelector } from "@/lib/hooks";
 import { ErrorMessageText } from "@/util/validation-utils";
-import { combineDateAndTime } from "@/util/calendar-utils";
+import {
+  combineDateAndTime,
+  combineDateAndTimeUTC,
+} from "@/util/calendar-utils";
 import { useEventMutation } from "@/api/event/event-mutation";
 
 const selectOptions: SelectOption[] = [
@@ -82,12 +85,12 @@ export const AddEventForm = () => {
 
   const onSubmit = (data: EventFormSchemaData) => {
     console.log(combineDateAndTime(data.startDate, data.startTime));
-    const startDateTime = combineDateAndTime(
+    const startDateTime = combineDateAndTimeUTC(
       data.startDate,
       data.startTime,
     ).toISOString();
 
-    const endDateTime = combineDateAndTime(
+    const endDateTime = combineDateAndTimeUTC(
       data.endDate,
       data.endTime,
     ).toISOString();

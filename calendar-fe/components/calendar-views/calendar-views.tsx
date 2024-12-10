@@ -17,7 +17,6 @@ import "moment/locale/pl";
 import moment from "moment-timezone";
 import { GetEventsRequest, GetEventsResponse } from "@/api/event/event-dto";
 import { useEventsQuery } from "@/api/event/event-query";
-import { toUtcDateWithoutChangingTime } from "@/util/calendar-utils";
 import { PageableRequest } from "@/api/pageable";
 import { useRouter } from "next/navigation";
 
@@ -42,8 +41,10 @@ const timelineOptionToBigCalendarView = (option: TimelineOption): View => {
   }
 };
 
-const convertToZonedDateTime = (utcDate: Date, zoneId: string): Date => {
-  return moment.utc(utcDate).tz(zoneId).toDate();
+const convertToZonedDateTime = (utcDate: string, zoneId: string): Date => {
+  const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const dateInUtc = moment.tz(utcDate, zoneId).utc();
+  return dateInUtc.clone().tz(currentTimezone).toDate();
 };
 
 const daysInMonth = (month: number, year: number): number => {
@@ -207,16 +208,10 @@ export function MyBigCalendarViews({
       localizer={localizer}
       events={events}
       startAccessor={(event) =>
-        convertToZonedDateTime(
-          toUtcDateWithoutChangingTime(new Date(event.startDateTime)),
-          event.zoneId,
-        )
+        convertToZonedDateTime(event.startDateTime, event.zoneId)
       }
       endAccessor={(event) =>
-        convertToZonedDateTime(
-          toUtcDateWithoutChangingTime(new Date(event.endDateTime)),
-          event.zoneId,
-        )
+        convertToZonedDateTime(event.endDateTime, event.zoneId)
       }
       titleAccessor={(event) => event.title}
       allDayAccessor={() => false}
