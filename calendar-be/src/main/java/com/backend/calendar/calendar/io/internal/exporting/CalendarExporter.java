@@ -1,4 +1,4 @@
-package com.backend.calendar.calendar.io.internal.export;
+package com.backend.calendar.calendar.io.internal.exporting;
 
 import com.backend.calendar.calendar.translations.CalendarRRuleTranslations;
 import com.backend.calendar.event.domain.CalendarEvent;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class CalendarExporter implements CalendarExporting {
+class CalendarExporter implements CalendarExporting {
     private final static String prodId = "-//Ben Fortuna//iCal4j 1.0//EN";
     private final CalendarRRuleTranslations translator;
 
