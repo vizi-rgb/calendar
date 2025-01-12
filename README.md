@@ -142,3 +142,12 @@ dependencies {
   }
 }
 ```
+
+## Showcase
+
+![login](https://github.com/user-attachments/assets/7c8bc0ef-e2fd-4230-899e-3adec5bc43fb)
+
+![showcase](https://github.com/user-attachments/assets/2c65485e-23bb-4ebd-835a-af077846220c)
+
+![Zrzut ekranu z 2025-01-11 20-59-52](https://github.com/user-attachments/assets/819db58f-5656-4ea9-a8dd-9007b5a9f8ac)
+
