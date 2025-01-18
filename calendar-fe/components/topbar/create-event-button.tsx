@@ -44,10 +44,7 @@ const EventSheet = ({
             <TabsTrigger value="task">Zadanie</TabsTrigger>
           </TabsList>
           <TabsContent value="event">
-            <AddEventForm
-              onSubmitClicked={() => setIsLoading(true)}
-              onComplete={() => setIsLoading(false)}
-            />
+            <AddEventForm />
           </TabsContent>
           <TabsContent value="task">
             <AddTaskForm />

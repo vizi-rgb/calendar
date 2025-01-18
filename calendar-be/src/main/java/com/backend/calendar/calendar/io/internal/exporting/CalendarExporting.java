@@ -1,4 +1,4 @@
-package com.backend.calendar.calendar.io.internal.export;
+package com.backend.calendar.calendar.io.internal.exporting;
 
 import com.backend.calendar.event.domain.CalendarEvent;
 import com.backend.calendar.task.domain.CalendarTask;
