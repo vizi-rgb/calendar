@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 import endpoints from "../api/endpoints";
 import User from "@/dto/user";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 import {
   AuthResponse,
@@ -9,6 +9,10 @@ import {
   LoginRequest,
   RegisterRequest,
 } from "@/dto/auth";
+
+interface CustomJwtPayload extends JwtPayload {
+  userId: string;
+}
 
 const decodeJwt = (token: string) => {
   return jwt.decode(token, { complete: true });
@@ -45,7 +49,15 @@ const UserService = {
       .then(async (response) => {
         const accessToken = response.data.token;
         const decoded = decodeJwt(accessToken);
-        const user = (await UserService.getUser(decoded.payload.userId)).data;
+        if (!decoded || !(decoded.payload as CustomJwtPayload).userId) {
+          throw new Error("Invalid token");
+        }
+
+        const user = (
+          await UserService.getUser(
+            (decoded.payload as CustomJwtPayload).userId,
+          )
+        ).data;
 
         onSuccess({ accessToken, user });
       })

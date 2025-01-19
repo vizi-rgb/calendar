@@ -17,6 +17,7 @@ import {
 const persistConfig = {
   key: "root",
   storage,
+  blacklist: ["accessToken", "date"],
 };
 
 export const makeStore = () => {
