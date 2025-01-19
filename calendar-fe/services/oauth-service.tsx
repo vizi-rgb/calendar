@@ -11,6 +11,7 @@ const oauthClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 const tokenExchangeUri = "https://oauth2.googleapis.com/token";

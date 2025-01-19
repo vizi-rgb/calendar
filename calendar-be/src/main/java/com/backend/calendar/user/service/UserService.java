@@ -148,12 +148,9 @@ public class UserService {
             throw new IllegalArgumentException("User already exists");
         }
 
-        if (!user.getIsEnabled()) {
-            sendVerificationEmail(user);
-        }
-
         final var authResponse = generateAuthResponse(user);
         setNewRefreshToken(user, authResponse.refreshToken());
+        userRepository.save(user);
 
         return authResponse;
     }
